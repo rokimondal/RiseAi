@@ -6,10 +6,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { fonts } from '@/data/editor'
 import { cn } from '@/lib/utils'
 import { useEditorStore } from '@/store/use-editor-store'
-import { AlignCenterIcon, AlignJustifyIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, ChevronDownIcon, HighlighterIcon, ImageIcon, ItalicIcon, Link2Icon, ListTodoIcon, MoveVertical, PrinterIcon, Redo2Icon, RemoveFormattingIcon, SearchIcon, SpellCheckIcon, UnderlineIcon, Undo2Icon, Upload } from 'lucide-react'
+import { AlignCenterIcon, AlignJustifyIcon, AlignLeftIcon, AlignRightIcon, ArrowDownToLine, BoldIcon, ChevronDownIcon, HighlighterIcon, ImageIcon, ItalicIcon, Link2Icon, List, ListOrderedIcon, ListTodoIcon, MergeIcon, MinusIcon, MoveVertical, PlusIcon, PrinterIcon, Redo2Icon, RemoveFormattingIcon, SearchIcon, SpellCheckIcon, SplitIcon, Table2Icon, TableIcon, Trash2Icon, UnderlineIcon, Undo2Icon, Upload } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import React, { useEffect, useState } from 'react'
 import { SketchPicker } from 'react-color'
+import AiButton from './AiButton'
+
+
 
 
 const ToolbarButton = ({ onClick, isActive, icon: Icon }) => {
@@ -248,42 +251,277 @@ const HeadingLevelButton = () => {
 
 const CustomTableButton = () => {
     const { editor } = useEditorStore();
+    const [rows, setRows] = useState(0);
+    const [cols, setCols] = useState(0);
+    const [tableSize, setTableSize] = useState({ rows: 0, cols: 0 });
+    const isInTable = editor?.isActive("table");
+    const getTableNode = (editor) => {
+        if (!editor) return null;
+        const { state } = editor;
+        const { selection } = state;
+        let tableNode = null;
 
-    const tableSizes = [
-        { rows: 2, cols: 2 },
-        { rows: 3, cols: 3 },
-        { rows: 4, cols: 4 },
-        { rows: 5, cols: 5 },
-    ];
+        state.doc.nodesBetween(selection.from, selection.to, (node) => {
+            if (node.type.name === "table") {
+                tableNode = node;
+            }
+        });
 
-    const insertTable = (rows, cols) => {
-        editor
-            ?.chain()
-            .focus()
-            .insertTable({ rows, cols, withHeaderRow: true })
-            .run();
+        return tableNode;
+    };
+
+
+    useEffect(() => {
+        if (isInTable && editor) {
+            try {
+                const table = getTableNode(editor);
+                setTableSize({ rows: table?.childCount || 0, cols: table?.firstChild.childCount || 0 });
+            } catch {
+                setTableSize({ rows: 0, cols: 0 });
+            }
+        } else {
+            setTableSize({ rows: 0, cols: 0 });
+        }
+    }, [editor, isInTable]);
+
+    const insertTable = () => {
+        if (!editor) return;
+        if (rows > 0 && cols > 0) {
+            editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
+        }
+    };
+
+    const deleteTable = () => editor?.chain().focus().deleteTable().run();
+    const addRowAbove = () => editor?.chain().focus().addRowBefore().run();
+    const addRowBelow = () => editor?.chain().focus().addRowAfter().run();
+    const addColLeft = () => editor?.chain().focus().addColumnBefore().run();
+    const addColRight = () => editor?.chain().focus().addColumnAfter().run();
+
+    // Safe delete
+    const deleteRow = () => {
+        if (tableSize.rows > 1) editor?.chain().focus().deleteRow().run();
+    };
+    const deleteCol = () => {
+        if (tableSize.cols > 2) editor?.chain().focus().deleteColumn().run();
+    };
+
+    const mergeCells = () => editor?.chain().focus().mergeCells().run();
+
+    const splitCell = () => {
+        editor?.chain().focus().splitCell().run();
     };
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button className="h-7 w-[120px] flex justify-between items-center rounded-sm hover:bg-muted px-2 text-sm">
-                    Insert Table
-                    <ChevronDownIcon />
+                <button className='h-7 w-7 flex flex-col rounded-sm justify-center items-center shrink-0 hover:bg-muted px-1.5 text-sm overflow-y-auto'>
+                    <TableIcon className='size-4' />
                 </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="flex flex-col p-2">
-                {tableSizes.map((size, index) => (
-                    <button
-                        key={index}
-                        onClick={() => insertTable(size.rows, size.cols)}
-                        className="flex items-center justify-center px-2 py-1 rounded-sm hover:bg-muted/80"
+
+            <DropdownMenuContent className="flex flex-col gap-3 p-3 ">
+                {/* Insert Table */}
+                <div className="flex flex-col gap-1">
+                    <span className="text-xs text-muted-foreground font-medium">
+                        Insert Custom Table
+                    </span>
+                    <div className="flex gap-2 items-center">
+                        <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            value={isInTable ? tableSize.rows : rows}
+                            onChange={(e) => setRows(Number(e.target.value))}
+                            className="w-12 h-7 rounded-sm text-center text-sm outline-none"
+                            placeholder="Rows"
+                            disabled={isInTable}
+                        />
+                        <span className="text-muted-foreground text-sm">x</span>
+                        <input
+                            type="number"
+                            min="1"
+                            value={isInTable ? tableSize.cols : cols}
+                            onChange={(e) => setCols(Number(e.target.value))}
+                            className="w-12 h-7 rounded-sm text-center text-sm outline-none"
+                            placeholder="Cols"
+                            disabled={isInTable}
+                        />
+                        <Button
+                            size="sm"
+                            className="h-7 px-2"
+                            onClick={insertTable}
+                            disabled={isInTable}
+                        >
+                            <Table2Icon size={14} className="mr-1" />
+                            Add
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="border-t"></div>
+
+                {/* Row Actions */}
+                <div className="flex flex-col gap-1">
+                    <span className="text-xs text-muted-foreground font-medium">
+                        Row Actions
+                    </span>
+                    <div className="flex flex-col items-center">
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={addRowAbove}
+                            disabled={!isInTable}
+                            className="h-7 text-sm flex items-center justify-start w-full"
+                        >
+                            <PlusIcon size={14} className="mr-1" /> Row Above
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={addRowBelow}
+                            disabled={!isInTable}
+                            className="h-7 text-sm flex items-center justify-start w-full"
+                        >
+                            <PlusIcon size={14} className="mr-1" /> Row Below
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={deleteRow}
+                            disabled={!isInTable || tableSize.rows <= 1}
+                            className="h-7 text-sm flex items-center justify-start col-span-2 w-full"
+                        >
+                            <MinusIcon size={14} className="mr-1" /> Delete Row
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="border-t"></div>
+
+                {/* Column Actions */}
+                <div className="flex flex-col gap-1">
+                    <span className="text-xs text-muted-foreground font-medium">
+                        Column Actions
+                    </span>
+                    <div className="flex flex-col items-center">
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={addColLeft}
+                            disabled={!isInTable}
+                            className="h-7 text-sm flex items-center justify-start w-full"
+                        >
+                            <PlusIcon size={14} className="mr-1" /> Col Left
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={addColRight}
+                            disabled={!isInTable}
+                            className="h-7 text-sm flex items-center justify-start w-full"
+                        >
+                            <PlusIcon size={14} className="mr-1" /> Col Right
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={deleteCol}
+                            disabled={!isInTable || tableSize.cols <= 2}
+                            className="h-7 text-sm flex items-center justify-start col-span-2 w-full"
+                        >
+                            <MinusIcon size={14} className="mr-1" /> Delete Column
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="border-t"></div>
+
+                {/* Merge / Split */}
+                <div className="flex flex-col gap-1">
+                    <span className="text-xs text-muted-foreground font-medium">
+                        Cell Actions
+                    </span>
+                    <div className="flex flex-col items-center">
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={mergeCells}
+                            disabled={!isInTable}
+                            className="h-7 text-sm flex items-center justify-start w-full"
+                        >
+                            <MergeIcon size={14} className="mr-1" /> Merge
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={splitCell}
+                            disabled={!isInTable}
+                            className="h-7 text-sm flex items-center justify-start w-full"
+                        >
+                            <SplitIcon size={14} className="mr-1" /> Split
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="border-t"></div>
+
+                {/* Table Actions */}
+                <div className="flex flex-col gap-1">
+                    <span className="text-xs text-muted-foreground font-medium">
+                        Table Actions
+                    </span>
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        className="flex justify-start items-center h-7 text-sm text-red-500 hover:text-red-500"
+                        onClick={deleteTable}
+                        disabled={!isInTable}
                     >
-                        {size.rows} x {size.cols} Table
-                    </button>
-                ))}
+                        <Trash2Icon size={14} className="mr-2" />
+                        Delete Table
+                    </Button>
+                    {!isInTable && (
+                        <span className="text-xs text-muted-foreground italic px-1">
+                            No table selected
+                        </span>
+                    )}
+                </div>
             </DropdownMenuContent>
         </DropdownMenu>
+    );
+};
+
+const OrderedListButton = () => {
+    const { editor } = useEditorStore();
+
+    const toggleList = () => editor?.chain().focus().toggleOrderedList().run();
+
+    return (
+        <div className="flex items-center gap-2">
+            <button
+                onClick={toggleList}
+                className='h-7 w-7 flex flex-col rounded-sm justify-center items-center shrink-0 hover:bg-muted px-1.5 text-sm overflow-y-auto'
+            >
+                <ListOrderedIcon className='size-4' />
+            </button>
+        </div>
+    );
+};
+
+const UnorderedListButton = () => {
+    const { editor } = useEditorStore();
+
+    const toggleList = () => editor?.chain().focus().toggleBulletList().run();
+
+    return (
+        <div className="flex items-center gap-2">
+            <button
+                onClick={toggleList}
+                className='h-7 w-7 flex flex-col rounded-sm justify-center items-center shrink-0 hover:bg-muted px-1.5 text-sm overflow-y-auto'
+            >
+                <List className='size-4' />
+            </button>
+        </div>
     );
 };
 
@@ -528,7 +766,7 @@ const TextColourButton = () => {
     )
 }
 
-const Toolbar = () => {
+const Toolbar = ({ initialContent }) => {
     const { editor } = useEditorStore();
 
     const sections = [
@@ -542,6 +780,11 @@ const Toolbar = () => {
                 label: "Redo",
                 icon: Redo2Icon,
                 onClick: () => editor?.commands.redo(),
+            },
+            {
+                label: "Download",
+                icon: ArrowDownToLine,
+                onClick: () => { },
             },
             {
                 label: "Print",
@@ -579,21 +822,21 @@ const Toolbar = () => {
         ],
         [
             {
+                label: "Remove Formatting",
+                icon: RemoveFormattingIcon,
+                onClick: () => editor?.chain().focus().unsetAllMarks().run(),
+            },
+            {
                 label: "List Todo",
                 icon: ListTodoIcon,
                 isActive: editor?.isActive("taskList"),
                 onClick: () => editor?.chain().focus().toggleTaskList().run(),
             },
-            {
-                label: "Remove Formatting",
-                icon: RemoveFormattingIcon,
-                onClick: () => editor?.chain().focus().unsetAllMarks().run(),
-            },
         ]
     ]
 
     return (
-        <div className="bg-background px-2.5 py-0.5 rounded-md min-h-[40px] flex items-center gap-0.5  overflow-x-auto">
+        <div className="bg-background px-2.5 py-0.5 rounded-md min-h-[40px] flex items-center gap-0.5  overflow-x-auto flex-wrap justify-center">
             {sections[0].map((btn, idx) => (
                 <ToolbarButton
                     key={idx}
@@ -615,13 +858,15 @@ const Toolbar = () => {
             {sections[2].map((item, index) => (
                 <ToolbarButton key={index} {...item} />
             ))}
-            <TextColourButton />
-            <HighlightColorButton />
+            <OrderedListButton />
+            <UnorderedListButton />
 
             <div className="h-6 w-1 rounded-lg bg-muted-foreground/20 mx-2" />
             {sections[1].map((item, index) => (
                 <ToolbarButton key={index} {...item} />
             ))}
+            <TextColourButton />
+            <HighlightColorButton />
 
             <div className="h-6 w-1 rounded-lg bg-muted-foreground/20 mx-2" />
             <LineHeightButton />
@@ -631,7 +876,9 @@ const Toolbar = () => {
             <LinkButton />
             <ImageButton />
             <CustomTableButton />
-            <div className="h-6 w-1 rounded-lg bg-muted-foreground/20 mx-2" />
+
+            <AiButton initialContent={initialContent} />
+
         </div>
     )
 }

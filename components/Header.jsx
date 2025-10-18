@@ -1,5 +1,4 @@
-
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -22,6 +21,8 @@ const Header = async () => {
                             alt="RiseAI Logo"
                             fill
                             className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 200px"
+                            priority
                         />
                     </div>
                 </Link>
@@ -73,7 +74,10 @@ const Header = async () => {
                         </DropdownMenu>
                     </SignedIn>
 
-                    <SignedOut>
+                    <SignedOut
+                        mode="modal"
+                        fallbackRedirectUrl="/dashboard"
+                    >
                         <SignInButton>
                             <Button variant={"outline"}> Sign In</Button>
                         </SignInButton>
@@ -87,7 +91,7 @@ const Header = async () => {
                                     userPreviewMainIdentifier: "font-semibold"
                                 }
                             }}
-                            afterSignOutUrl='/'
+                            fallbackRedirectUrl='/'
                         />
                     </SignedIn>
                 </div>

@@ -37,7 +37,6 @@ const OnboardingForm = ({ industries }) => {
   const watchIndustry = watch("industry");
 
   const onSubmit = async (values) => {
-    console.log(values);
     try {
       const formattedIndustry = `${values.industry}-${values.subIndustry
         .toLowerCase()

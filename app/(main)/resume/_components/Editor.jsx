@@ -57,41 +57,16 @@ const Editor = () => {
         },
         extensions: [
             StarterKit,
-            ListKit,
-            TaskList.configure({
-                nested: true,
-            }),
-            TaskItem.configure({
-                nested: true,
-            }),
             TableKit.configure({ resizable: true }),
-            Document,
-            Paragraph,
-            Text,
-            Image,
-            ResizableImage.configure({
-                defaultWidth: 200,
-                defaultHeight: 200,
-            }),
-            Dropcursor,
-            Underline,
+            ResizableImage.configure({ defaultWidth: 200, defaultHeight: 200 }),
             FontFamily,
             FontSize,
+            TaskList.configure({ nested: true }),
+            TaskItem.configure({ nested: true }),
             TextStyle,
-            Highlight.configure({
-                multicolor: true,
-            }),
-            Color.configure({
-                types: ["textStyle"],
-            }),
-            Link.configure({
-                openOnClick: false,
-                autolink: true,
-                defaultProtocol: "https"
-            }),
-            TextAlign.configure({
-                types: ['heading', 'paragraph'],
-            }),
+            Highlight.configure({ multicolor: true }),
+            Color.configure({ types: ["textStyle"] }),
+            TextAlign.configure({ types: ['heading', 'paragraph'] }),
             LineHeight,
         ],
         content: `
@@ -113,7 +88,7 @@ const Editor = () => {
         immediatelyRender: false,
     })
     return (
-        <div className=' border border-black size-full overflow-x-auto px-4 print:p-0 print:bg-white print:overflow-visible'>
+        <div className='size-full overflow-x-auto px-4 print:p-0 print:bg-white print:overflow-visible'>
             <Ruler />
             <div className='min-w-max flex justify-center w-[816px] py-4 print:py-0 mx-auto print:w-full print:min-w-0'>
                 <EditorContent
