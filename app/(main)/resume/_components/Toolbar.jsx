@@ -6,11 +6,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { fonts } from '@/data/editor'
 import { cn } from '@/lib/utils'
 import { useEditorStore } from '@/store/use-editor-store'
-import { AlignCenterIcon, AlignJustifyIcon, AlignLeftIcon, AlignRightIcon, ArrowDownToLine, BoldIcon, ChevronDownIcon, HighlighterIcon, ImageIcon, ItalicIcon, Link2Icon, List, ListOrderedIcon, ListTodoIcon, MergeIcon, MinusIcon, MoveVertical, PlusIcon, PrinterIcon, Redo2Icon, RemoveFormattingIcon, SearchIcon, SpellCheckIcon, SplitIcon, Table2Icon, TableIcon, Trash2Icon, UnderlineIcon, Undo2Icon, Upload } from 'lucide-react'
+import { AlignCenterIcon, AlignJustifyIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, ChevronDownIcon, HighlighterIcon, ImageIcon, ItalicIcon, Link2Icon, List, ListOrderedIcon, ListTodoIcon, MergeIcon, MinusIcon, MoveVertical, PlusIcon, Redo2Icon, RemoveFormattingIcon, SearchIcon, SpellCheckIcon, SplitIcon, Table2Icon, TableIcon, Trash2Icon, UnderlineIcon, Undo2Icon, Upload } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import React, { useEffect, useState } from 'react'
 import { SketchPicker } from 'react-color'
 import AiButton from './AiButton'
+import { DownloadButton, SaveButton } from "./Button"
 
 
 
@@ -766,7 +767,7 @@ const TextColourButton = () => {
     )
 }
 
-const Toolbar = ({ initialContent }) => {
+const Toolbar = () => {
     const { editor } = useEditorStore();
 
     const sections = [
@@ -780,16 +781,6 @@ const Toolbar = ({ initialContent }) => {
                 label: "Redo",
                 icon: Redo2Icon,
                 onClick: () => editor?.commands.redo(),
-            },
-            {
-                label: "Download",
-                icon: ArrowDownToLine,
-                onClick: () => { },
-            },
-            {
-                label: "Print",
-                icon: PrinterIcon,
-                onClick: () => window.print(),
             },
             {
                 label: "Spell Check",
@@ -836,7 +827,7 @@ const Toolbar = ({ initialContent }) => {
     ]
 
     return (
-        <div className="bg-background px-2.5 py-0.5 rounded-md min-h-[40px] flex items-center gap-0.5  overflow-x-auto flex-wrap justify-center">
+        <div className="bg-background px-2.5 py-0.5 rounded-md min-h-[40px] flex items-center gap-0.5  overflow-x-auto flex-wrap justify-center print:hidden " >
             {sections[0].map((btn, idx) => (
                 <ToolbarButton
                     key={idx}
@@ -876,8 +867,10 @@ const Toolbar = ({ initialContent }) => {
             <LinkButton />
             <ImageButton />
             <CustomTableButton />
-
-            <AiButton initialContent={initialContent} />
+            
+            <AiButton />
+            <DownloadButton />
+            <SaveButton />
 
         </div>
     )

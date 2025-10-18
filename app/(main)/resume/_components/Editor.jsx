@@ -1,31 +1,28 @@
 'use client'
 
-import { ListKit, TaskItem, TaskList } from '@tiptap/extension-list'
-import Image from '@tiptap/extension-image'
+import { TaskItem, TaskList } from '@tiptap/extension-list'
 import { TableKit } from '@tiptap/extension-table'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import Document from '@tiptap/extension-document'
-import Paragraph from '@tiptap/extension-paragraph'
-import Text from '@tiptap/extension-text'
-import { Dropcursor } from '@tiptap/extensions'
 import 'tiptap-extension-resizable-image/styles.css';
 import { ResizableImage } from 'tiptap-extension-resizable-image'
 import { useEditorStore } from '@/store/use-editor-store'
-import Underline from '@tiptap/extension-underline'
 import { TextStyle, FontFamily, FontSize, LineHeight } from '@tiptap/extension-text-style'
 import Highlight from '@tiptap/extension-highlight'
 import { Color } from '@tiptap/extension-text-style'
-import Link from '@tiptap/extension-link'
 import TextAlign from '@tiptap/extension-text-align'
 import Ruler from './Ruler'
+import { useRef } from 'react'
+import { useMarginStore } from '@/store/use-margin-store'
 
 
 
 
-const Editor = () => {
+const Editor = ({ initialContent }) => {
+    const printRef = useRef(null)
 
     const { setEditor } = useEditorStore();
+    const { marginLeft, marginRight } = useMarginStore();
 
     const editor = useEditor({
         onCreate({ editor }) {
@@ -51,7 +48,7 @@ const Editor = () => {
         },
         editorProps: {
             attributes: {
-                style: "padding-left: 56px; padding-right: 56px;",
+                style: `padding-left: ${marginLeft}px; padding-right: ${marginRight}px;`,
                 class: 'focus:outline-none print:border-0 border-2 editor flex flex-col min-h-[1054px] w-[816px] pt-10 pr-14 pb-10 cursor-text'
             }
         },
@@ -69,28 +66,13 @@ const Editor = () => {
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
             LineHeight,
         ],
-        content: `
-      <table>
-  <tbody>
-    <tr>
-      <th>Name</th>
-      <th colspan="3">Description</th>
-    </tr>
-    <tr>
-      <td>Cyndi Lauper</td>
-      <td>Singer</td>
-      <td>Songwriter</td>
-      <td>Actress</td>
-      </tr>
-  </tbody>
-</table>
-`,
+        content: initialContent,
         immediatelyRender: false,
     })
     return (
         <div className='size-full overflow-x-auto px-4 print:p-0 print:bg-white print:overflow-visible'>
             <Ruler />
-            <div className='min-w-max flex justify-center w-[816px] py-4 print:py-0 mx-auto print:w-full print:min-w-0'>
+            <div ref={printRef} className='min-w-max flex justify-center w-[816px] py-4 mx-auto print:fixed print:top-0 print:left-0 print:w-full print:min-w-0 print:py-0 print:m-0 '>
                 <EditorContent
                     className="tiptap-light"
                     editor={editor}

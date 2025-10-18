@@ -74,7 +74,6 @@ const AiButton = () => {
 
     useEffect(() => {
         if (improvedResumeData?.success && !improvingResume) {
-            // console.log(improvedResumeData);
             editor.commands.setContent(improvedResumeData.data, false);
             toast.success("Resume improved successfully!");
         }
@@ -86,10 +85,9 @@ const AiButton = () => {
                 <DropdownMenuTrigger asChild>
                     <Button
                         variant="outline"
-                        className="ml-5"
+                        className="mr-1"
                     >
-                        <WandSparkles />
-                        Ai
+                        <WandSparkles size={16} />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
