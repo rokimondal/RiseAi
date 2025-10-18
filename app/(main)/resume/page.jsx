@@ -8,7 +8,6 @@ export default async function ResumePage() {
     <div className="container mx-auto py-6">
       <ResumeBuilder
       // initialContent={resume?.content}
-      // initialContent={null}
       />
     </div>
   );
