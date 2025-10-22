@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
@@ -15,88 +9,88 @@ datasource db {
 }
 
 model User {
-  id  String @id @default(uuid())
-  clerkUserId String @unique
-  email String @unique
-  name String?
-  imageUrl String?
-  industry String?
+  id              String           @id @default(uuid())
+  clerkUserId     String           @unique
+  email           String           @unique
+  name            String?
+  imageUrl        String?
+  industry        String?
+  createdAt       DateTime         @default(now())
+  updateAt        DateTime         @updatedAt
+  bio             String?
+  experience      Int?
+  skills          String[]
+  assessments     Assessment[]
+  coverLetter     CoverLetter[]
+  resume          Resume?
   industryInsight IndustryInsight? @relation(fields: [industry], references: [industry])
-  createdAt DateTime @default(now())
-  updateAt DateTime @updatedAt
-  bio String?
-  experience Int?
-  skills String[]
-  assessments Assessment[]
-  resume Resume?
-  coverLetter CoverLetter[]
 }
 
-model Assessment{
-  id String @id @default(cuid())
-  userId String
-  user User @relation(fields: [userId], references: [id])
-  quizScore Float
-  questions Json[] //{question, answere, userAnswere, isCorrect, explanation}
-  category String
+model Assessment {
+  id             String   @id @default(cuid())
+  userId         String
+  quizScore      Float
+  questions      Json[]
+  category       String
+  createdAt      DateTime @default(now())
+  updateAt       DateTime @updatedAt
   improvementTip String?
-  createdAt DateTime @default(now())
-  updateAt DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
 
-model Resume{
-  id String @id @default(cuid())
-  userId String @unique
-  user User @relation(fields: [userId], references: [id])
-  content String @db.Text
-  atsScore Float?
-  feedback String?
+model Resume {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  content   String
+  atsScore  Float?
+  feedback  String?
   createdAt DateTime @default(now())
-  updateAt DateTime @updatedAt
+  updateAt  DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
-model CoverLetter{
-  id String @id @default(cuid())
-  userId String
-  user User @relation(fields: [userId], references: [id])
-  content String
+model CoverLetter {
+  id             String   @id @default(cuid())
+  userId         String
+  content        String
   jobDescription String?
-  companyName String
-  jobTitle String
-  createdAt DateTime @default(now())
-  updateAt DateTime @updatedAt
+  companyName    String
+  jobTitle       String
+  status         String   @default("draft") // draft, completed
+  createdAt      DateTime @default(now())
+  updateAt       DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
 
-model IndustryInsight{
-  id String @id @default(cuid())
-  industry String @unique
-  users User[]
-  salaryRanges Json[] //{role: string, min: float, max:float, location: string?}
-  growthRate Float
-  demandLevel DemandLevel //high, midium, low
-  topSkills String[]
-  marketOutlook MarketOutlook //Positive, Negetive, Neutral
-  keyTrends String[]
+model IndustryInsight {
+  id                String        @id @default(cuid())
+  industry          String        @unique
+  salaryRanges      Json[]
+  growthRate        Float
+  demandLevel       DemandLevel
+  topSkills         String[]
+  marketOutlook     MarketOutlook
   recommendedSkills String[]
-  lastUpdated DateTime @default(now())
-  nextUpdate DateTime
+  lastUpdated       DateTime      @default(now())
+  nextUpdate        DateTime
+  keyTrends         String[]
+  users             User[]
 
   @@index([industry])
 }
 
-enum DemandLevel{
+enum DemandLevel {
   HIGH
   MEDIUM
   LOW
 }
 
-enum MarketOutlook{
+enum MarketOutlook {
   POSITIVE
   NEUTRAL
   NEGETIVE
-
 }
