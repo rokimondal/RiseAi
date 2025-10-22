@@ -1,14 +1,13 @@
 "use client"
 
-import { useRef, useState } from 'react';
+import { useMarginStore } from '@/store/use-margin-store';
+import { useEffect, useRef, useState } from 'react';
 import { FaCaretDown } from 'react-icons/fa'
 
 const markers = Array.from({ length: 83 }, (_, i) => i);
 
 const Ruler = () => {
-
-    const [leftMargin, setLeftMargin] = useState(56);
-    const [rightMargin, setRightMargin] = useState(56);
+    const { marginLeft: leftMargin, marginRight: rightMargin, setMarginLeft: setLeftMargin, setMarginRight: setRightMargin } = useMarginStore();
 
     const [isDraggingLeft, setIsDraggingLeft] = useState(false);
     const [isDraggingRight, setIsDraggingRight] = useState(false);
@@ -78,6 +77,7 @@ const Ruler = () => {
                     isDragging={isDraggingLeft}
                     onMouseDown={handleLeftMouseDown}
                     onDoubleClick={handleLeftDoubleClick}
+                    PAGE_WIDTH={PAGE_WIDTH}
                 />
                 <Marker
                     position={rightMargin}
@@ -85,6 +85,7 @@ const Ruler = () => {
                     isDragging={isDraggingRight}
                     onMouseDown={handleRightMouseDown}
                     onDoubleClick={handleRightDoubleClick}
+                    PAGE_WIDTH={PAGE_WIDTH}
                 />
                 <div className="absolute inset-x-0 bottom-0 h-full">
                     <div className="relative h-full w-[816px]">
@@ -119,12 +120,13 @@ const Ruler = () => {
     );
 };
 
-const Marker = ({ position, isLeft, isDragging, onMouseDown, onDoubleClick }) => {
+const Marker = ({ position, isLeft, isDragging, onMouseDown, onDoubleClick, PAGE_WIDTH }) => {
+    const style = isLeft
+        ? { left: `${position}px` }
+        : { left: `${PAGE_WIDTH - position - 2}px` };
     return (<div
         className="absolute top-0 w-4 h-full cursor-ew-resize z-[5] group -ml-2"
-        style={{
-            [isLeft ? "left" : "right"]: `${position}px`
-        }}
+        style={style}
         onMouseDown={onMouseDown}
         onDoubleClick={onDoubleClick}
     >

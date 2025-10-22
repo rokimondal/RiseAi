@@ -7,8 +7,8 @@ import Toolbar from "./Toolbar"
 const ResumeBuilder = ({ initialContent }) => {
     return (
         <div >
-            <Toolbar initialContent={initialContent} />
-            <Editor />
+            <Toolbar />
+            <Editor initialContent={initialContent} />
         </div>
     )
 }
