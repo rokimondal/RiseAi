@@ -1,13 +1,13 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
     images: {
-        domains: ["randomuser.me"],
         remotePatterns: [
             {
-                protocol: "https",
-                hostname: "randomuser.me",
-                pathname: "/api/portraits/**"
+                protocol: 'https',
+                hostname: 'randomuser.me',
             }
         ]
     }
 };
+
+export default nextConfig;
