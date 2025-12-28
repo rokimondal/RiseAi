@@ -38,7 +38,7 @@ const Quiz = () => {
     const calculateScore = () => {
         let correct = 0;
         answers.forEach((ans, index) => {
-            if (ans == quizData[index].correctAnswer) {
+            if (ans === quizData[index].correctAnswer) {
                 correct++;
             }
         })
