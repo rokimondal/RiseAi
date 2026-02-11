@@ -21,7 +21,7 @@ const QuestionAnswereCard = ({ q }) => {
                 <p>
                     <span className='font-bold'>Your answere: </span>{q.userAnswere}
                 </p>
-                {!q.isCorrect && <p><span className='font-bold'>Correct answere: </span>{q.userAnswere}</p>}
+                {!q.isCorrect && <p><span className='font-bold'>Correct answere: </span>{q.answere}</p>}
             </div>
 
             <AnimatePresence>

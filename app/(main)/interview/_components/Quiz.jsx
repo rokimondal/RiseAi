@@ -38,7 +38,7 @@ const Quiz = () => {
     const calculateScore = () => {
         let correct = 0;
         answers.forEach((ans, index) => {
-            if (ans === quizData[index].correctAnswer) {
+            if (ans.trim() == quizData[index].correctAnswer.trim()) {
                 correct++;
             }
         })
@@ -48,7 +48,6 @@ const Quiz = () => {
         const score = calculateScore();
         try {
             await saveQuizResultFn(quizData, answers, score);
-            console.log(resultData);
             toast.success("Quiz completed!")
         } catch (error) {
             toast.error(error.message || "Failed to save quiz results")
