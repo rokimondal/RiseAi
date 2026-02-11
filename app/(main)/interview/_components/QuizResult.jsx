@@ -8,14 +8,14 @@ import { Button } from '@/components/ui/button';
 const QuizResult = ({ result, hideStartNew = false, onStartNew }) => {
 
     if (!result) return null;
-
+    console.log(result);
     return (
         <div className='mx-auto'>
             <h1 className='flex items-center gap-2 text-3xl gradient-title'>
                 <Trophy className='h-6 w-6 text-yellow-500' />
                 Quiz Results
             </h1>
-
+            
             <CardContent className="space-y-6">
                 <div className="text-center space-y-2">
                     <h3 className='text-2xl font-bold'>{result.quizScore.toFixed(1)}%</h3>
