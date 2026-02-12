@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { Button } from './ui/button'
-import { ChevronDown, FileText, GraduationCap, LayoutDashboard, PenBox, StarsIcon } from 'lucide-react'
+import { BookOpenText, ChartSpline, ChevronDown, FileText, GraduationCap, LayoutDashboard, PenBox, StarsIcon } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { checkUser } from '@/lib/checkUser'
 import { ModeToggle } from './ModeToggle'
@@ -27,18 +27,40 @@ const Header = async () => {
                     </div>
                 </Link>
 
-                <div className='flex space-x-2 md:space-x-4'>
-                    <ModeToggle className="focus:outline-none" />
+                <div className='flex lg:space-x-2 ml-2'>
+                    <ModeToggle />
 
                     <SignedIn>
+
                         <Link href={"/dashboard"}>
-                            <Button variant={"outline"}>
+                            <Button variant={"ghost"} className="hover:cursor-pointer">
                                 <LayoutDashboard className='h-4 w-4' />
                                 <span className='hidden md:block'>Industry Insights</span>
                             </Button>
                         </Link>
 
-                        <DropdownMenu>
+                        <Link href={"/performance"}>
+                            <Button variant={"ghost"} className="hover:cursor-pointer">
+                                <ChartSpline className='h-4 w-4' />
+                                <span className='hidden md:block'>Performance</span>
+                            </Button>
+                        </Link>
+
+                        <Link href={"/preparation"}>
+                            <Button variant={"ghost"} className="hover:cursor-pointer">
+                                <BookOpenText className='h-4 w-4' />
+                                <span className='hidden md:block'>Preparation</span>
+                            </Button>
+                        </Link>
+
+                        <Link href={"/growth-tools"}>
+                            <Button variant={"ghost"} className="hover:cursor-pointer mr-1">
+                                <StarsIcon className='h-4 w-4' />
+                                <span className='hidden md:block'>Growth Tools</span>
+                            </Button>
+                        </Link>
+
+                        {/* <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button>
                                     <StarsIcon className='h-4 w-4' />
@@ -64,14 +86,14 @@ const Header = async () => {
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <Link href={"/interview"} className='flex items-center gap-2'>
+                                    <Link href={"/performance"} className='flex items-center gap-2'>
                                         <GraduationCap className='h-4 w-4' />
-                                        <span className='block'>Interview Prep</span>
+                                        <span className='block'>Performance</span>
 
                                     </Link>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
-                        </DropdownMenu>
+                        </DropdownMenu> */}
                     </SignedIn>
 
                     <SignedOut
@@ -79,19 +101,20 @@ const Header = async () => {
                         fallbackRedirectUrl="/dashboard"
                     >
                         <SignInButton>
-                            <Button variant={"outline"}> Sign In</Button>
+                            <Button variant={"outline"} className="ml-2"> Sign In</Button>
                         </SignInButton>
                     </SignedOut>
                     <SignedIn>
                         <UserButton
                             appearance={{
                                 elements: {
-                                    avatarBox: "w-10 h-10 ", // forces width & height
+                                    avatarBox: "w-9 h-9 ", // forces width & height
                                     userButtonPopoverCard: "shadow-xl",
                                     userPreviewMainIdentifier: "font-semibold"
                                 }
                             }}
                             fallbackRedirectUrl='/'
+                            className="ml-2"
                         />
                     </SignedIn>
                 </div>
