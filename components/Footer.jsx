@@ -5,7 +5,7 @@ const Footer = () => {
         <footer className="bg-muted/30 py-12 print:hidden">
             <div className="container mx-auto px-4 text-center text-foreground">
                 <p>
-                    © 2025 RiseAi. All rights reserved.
+                    © 2026 RiseAi. All rights reserved.
                 </p>
             </div>
         </footer>

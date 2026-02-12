@@ -42,25 +42,26 @@ const growthTools = [
     },
     {
         title: "Job Role Skill Match",
-        description: "Analyze your readiness for roles like Frontend, Backend, or SDE with skill match percentage.",
+        description: "Check your skill match percentage for your target job roles.",
         icon: Target,
         href: "#",
         status: "upcoming"
     },
     {
         title: "Resume ATS Score Checker",
-        description: "Evaluate your resume against ATS systems and improve keyword optimization.",
+        description: "Get your resume ATS score and improve keyword optimization.",
         icon: FileSearch,
         href: "#",
         status: "upcoming"
     },
     {
         title: "Salary Readiness Estimator",
-        description: "Estimate your market readiness and potential salary range based on your skill profile.",
+        description: "Estimate your potential salary based on your skills and readiness.",
         icon: DollarSign,
         href: "#",
         status: "upcoming"
     }
+
 ]
 
 export default function GrowthToolsPage() {
