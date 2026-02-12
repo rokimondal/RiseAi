@@ -15,7 +15,7 @@ const preparationTools = [
     // ✅ Available
     {
         title: "Technical Mock Test",
-        description: "Practice industry-specific mock tests designed to evaluate your skills.",
+        description: "Take industry-focused mock tests to evaluate your core skills and practical knowledge.",
         icon: Code2,
         href: "/preparation/mock-test",
         status: "available"
@@ -38,7 +38,7 @@ const preparationTools = [
     // 🚧 Upcoming
     {
         title: "Aptitude Test",
-        description: "Practice key quantitative and logical reasoning questions.",
+        description: "Practice important quantitative, verbal, and logical reasoning questions for exam success.",
         icon: Calculator,
         href: "#",
         status: "upcoming"
