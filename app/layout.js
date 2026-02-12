@@ -14,6 +14,9 @@ const inter = Inter({
 export const metadata = {
   title: "RiseAI",
   description: "AI powered assistant for your carreer growth",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {
