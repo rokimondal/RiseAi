@@ -16,14 +16,14 @@ const growthTools = [
         title: "Build Resume",
         description: "Create professional resumes tailored to your industry.",
         icon: FileText,
-        href: "/resume",
+        href: "/growth-tools/resume",
         status: "available"
     },
     {
         title: "Cover Letter Generator",
         description: "Generate AI-powered personalized cover letters.",
         icon: PenBox,
-        href: "/ai-cover-letter",
+        href: "/growth-tools/ai-cover-letter",
         status: "available"
     },
     {

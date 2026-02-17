@@ -80,7 +80,7 @@ Roki Mondal`,
     <div>
       <div className='flex flex-col md:flex-row justify-between items-center mb-5'>
         <h1 className='text-6xl font-bold gradient-title'>My Cover Letters</h1>
-        <Link href="/ai-cover-letter/new">
+        <Link href="/growth-tools/ai-cover-letter/new">
           <Button>
             <Plus className='w-4 h-4' />
             Create New

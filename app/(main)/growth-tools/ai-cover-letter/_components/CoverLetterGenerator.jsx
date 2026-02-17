@@ -49,7 +49,7 @@ const CoverLetterGenerator = () => {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="companyName">Company Name</Label>
                                 <Input

@@ -1,6 +1,3 @@
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
 import React from 'react'
 import { getUserOnboardingStatus } from '@/actions/user'
 import Quiz from './_components/Quiz'
@@ -16,7 +13,7 @@ const MockInterviewPage = async () => {
   return (
     <div className='container mx-auto space-y-4 py-6'>
       <div className='flex flex-col space-y-2 mx-2'>
-        <BackButton/>
+        <BackButton />
         <div>
           <h1 className='text-6xl gradient-title font-bold'>Mock Test</h1>
           <p className='text-muted-foreground'>
