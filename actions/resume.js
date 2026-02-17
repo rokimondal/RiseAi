@@ -139,7 +139,7 @@ Requirements:
         let improvedContent;
         try {
 
-            console.log("prompt", prompt);
+            // console.log("prompt", prompt);
             const parsed = JSON.parse(cleanedText);
             improvedContent = parsed.html || "";
 
@@ -149,7 +149,7 @@ Requirements:
         }
         improvedContent = improvedContent.trim();
 
-        console.log("improved content", improvedContent);
+        // console.log("improved content", improvedContent);
         function unmaskAll(content, matches, placeholder, defaultValue) {
             if (matches.length > 0) {
                 matches.forEach(item => {
@@ -167,7 +167,7 @@ Requirements:
         improvedContent = unmaskAll(improvedContent, twitters, PLACEHOLDERS.twitter, "twitter");
 
 
-        console.log("after unmask", improvedContent);
+        // console.log("after unmask", improvedContent);
 
         return { success: true, data: improvedContent };
     } catch (error) {

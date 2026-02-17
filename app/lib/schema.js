@@ -71,3 +71,15 @@ export const coverLetterSchema = z.object({
     jobTitle: z.string().min(1, "Job title is required"),
     jobDescription: z.string().min(1, "Job description is required"),
 })
+
+export const interviewSchema = z.object({
+    companyName: z.string().min(1, "Company name is required"),
+    jobTitle: z.string().min(1, "Job title is required"),
+    jobDescription: z.string().min(1, "Job description is required"),
+    interviewType: z.enum(
+        ["Technical", "HR", "Behavioral", "System Design", "Coding", "Mixed"],
+        {
+            required_error: "Interview type is required",
+        }
+    ),
+})

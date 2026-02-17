@@ -58,7 +58,7 @@ const CoverLetterList = ({ coverLetters }) => {
                                     <Button
                                         variant="outline"
                                         size="icon"
-                                        onClick={() => router.push(`/ai-cover-letter/${letter.id}`)}
+                                        onClick={() => router.push(`/growth-tools/ai-cover-letter/${letter.id}`)}
                                     >
                                         <Eye className="h-4 w-4" />
                                     </Button>

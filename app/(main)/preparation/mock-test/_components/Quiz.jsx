@@ -1,6 +1,6 @@
 "use client"
 
-import { generateQuiz, saveQuizResult } from '@/actions/interview';
+import { generateQuiz, saveQuizResult } from '@/actions/mock-test';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';

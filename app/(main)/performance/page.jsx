@@ -1,4 +1,4 @@
-import { getAssessments } from '@/actions/interview'
+import { getAssessments } from '@/actions/mock-test'
 import React from 'react'
 import StatsCard from './_components/StatsCard'
 import PerformanceChart from './_components/PerformanceChart'
