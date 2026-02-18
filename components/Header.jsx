@@ -7,6 +7,7 @@ import { BookOpenText, ChartSpline, ChevronDown, FileText, GraduationCap, Layout
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { checkUser } from '@/lib/checkUser'
 import { ModeToggle } from './ModeToggle'
+import HeaderAuth from './HeaderAuth'
 
 const Header = async () => {
 
@@ -59,64 +60,9 @@ const Header = async () => {
                                 <span className='hidden md:block'>Growth Tools</span>
                             </Button>
                         </Link>
-
-                        {/* <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button>
-                                    <StarsIcon className='h-4 w-4' />
-                                    <span className='hidden md:block'>Growth Tools</span>
-                                    <ChevronDown className='h-4 w-4' />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent >
-                                <DropdownMenuItem>
-                                    <Link href={"/resume"} className='flex items-center gap-2 w-full '>
-
-                                        <FileText className='h-4 w-4' />
-                                        <span className='block md:block'>Build Resume</span>
-
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Link href={"/ai-cover-letter"} className='flex items-center gap-2'>
-
-                                        <PenBox className='h-4 w-4' />
-                                        <span className='block'>Cover Letter</span>
-
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Link href={"/performance"} className='flex items-center gap-2'>
-                                        <GraduationCap className='h-4 w-4' />
-                                        <span className='block'>Performance</span>
-
-                                    </Link>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu> */}
                     </SignedIn>
 
-                    <SignedOut
-                        mode="modal"
-                        fallbackRedirectUrl="/dashboard"
-                    >
-                        <SignInButton>
-                            <Button variant={"outline"} className="ml-2"> Sign In</Button>
-                        </SignInButton>
-                    </SignedOut>
-                    <SignedIn>
-                        <UserButton
-                            appearance={{
-                                elements: {
-                                    avatarBox: "w-9 h-9 ", // forces width & height
-                                    userButtonPopoverCard: "shadow-xl",
-                                    userPreviewMainIdentifier: "font-semibold"
-                                }
-                            }}
-                            fallbackRedirectUrl='/'
-                            className="ml-2"
-                        />
-                    </SignedIn>
+                    <HeaderAuth/>
                 </div>
             </nav>
 

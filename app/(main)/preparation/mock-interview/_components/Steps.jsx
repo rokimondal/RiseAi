@@ -15,14 +15,20 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import IntroductionPage from './IntroductionPage';
 import InterviewForm from './InterviewForm';
+import ResumeSelector from './ResumeSelector';
+import Instructions from './Instructions';
 
 const Steps = () => {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(4);
     const [formData, setFormData] = useState(null);
+    const [resumeContent, setResumeContent] = useState("");
 
     const { loading: generating, fn: generateInterviewQuestionFn, data: generatedInterviewQuestion } = useFetch(generateInterviewQuestion);
 
-
+    useEffect(() => {
+        console.log("formdata: ", formData);
+        console.log("resumeContent: ", resumeContent);
+    }, [formData, resumeContent]);
 
     // useEffect(() => {
     //     if (generatedInterviewQuestion) {
@@ -36,11 +42,6 @@ const Steps = () => {
     //         toast.error(error.message || "Failed to generate cover letter");
     //     }
     // }
-
-    useEffect(() => {
-        console.log("updated form data: ", formData)
-    }, [formData])
-
 
 
     if (step == 1) {
@@ -56,11 +57,17 @@ const Steps = () => {
     }
 
     if (step == 3) {
-        return (<>skeudfhb</>);
+        return (<ResumeSelector setResumeContent={setResumeContent} setStep={setStep} />);
+    }
+
+    if (step == 4) {
+        return (
+            <Instructions />
+        )
     }
 
     return (
-        <div>Steps</div>
+        <div>Step</div>
     )
 }
 
