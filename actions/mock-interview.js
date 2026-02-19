@@ -9,7 +9,7 @@ const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash"
 })
 
-export async function generateInterviewQuestion({ jobTitle, jobDescription, interviewType, resumeContent }) {
+export async function generateInterviewQuestion({ companyName, jobTitle, jobDescription, interviewType, resumeContent }) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
@@ -61,6 +61,8 @@ This interview will happen via voice call, so questions must sound natural, conv
 Your task is to design a complete interview plan.
 
 INPUTS:
+
+Company Name: ${companyName}
 
 Job Title: ${jobTitle}
 
