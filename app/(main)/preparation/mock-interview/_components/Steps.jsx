@@ -17,11 +17,14 @@ import IntroductionPage from './IntroductionPage';
 import InterviewForm from './InterviewForm';
 import ResumeSelector from './ResumeSelector';
 import Instructions from './Instructions';
+import { toast } from 'sonner';
+import Interview from './Interview';
 
 const Steps = () => {
-    const [step, setStep] = useState(4);
+    const [step, setStep] = useState(5);
     const [formData, setFormData] = useState(null);
     const [resumeContent, setResumeContent] = useState("");
+    const [startingInterview, setStartingInterview] = useState(false);
 
     const { loading: generating, fn: generateInterviewQuestionFn, data: generatedInterviewQuestion } = useFetch(generateInterviewQuestion);
 
@@ -29,6 +32,35 @@ const Steps = () => {
         console.log("formdata: ", formData);
         console.log("resumeContent: ", resumeContent);
     }, [formData, resumeContent]);
+
+    const dumyGeneratedInterviewQuestion = {
+        "interviewType": "Technical",
+        "jobTitle": "Software Developer Engineer I",
+        "totalDuration": 1.1,
+        "questions": [
+            {
+                "id": "q1",
+                "question": "Tell me about yourself and your background in software development.",
+                "type": "Introduction",
+                "difficulty": "Easy",
+                "expectedAnswerTimeMinutes": 2,
+                "skillsTested": ["Communication", "Self-awareness"],
+                "followUps": []
+            },
+            {
+                "id": "q2",
+                "question": "Explain how JWT authentication works in a MERN stack application.",
+                "type": "Technical",
+                "difficulty": "Medium",
+                "expectedAnswerTimeMinutes": 5,
+                "skillsTested": ["Authentication", "Backend", "Security"],
+                "followUps": [
+                    "How do you handle token expiration?",
+                    "What are the security risks of JWT?"
+                ]
+            }
+        ]
+    }
 
     // useEffect(() => {
     //     if (generatedInterviewQuestion) {
@@ -43,27 +75,49 @@ const Steps = () => {
     //     }
     // }
 
+    useEffect(() => {
+        if (generatedInterviewQuestion) {
+            setStep(5);
+        }
+    }, [generatedInterviewQuestion])
 
-    if (step == 1) {
-        return (
-            <IntroductionPage setStep={setStep} />
-        )
+    const handleStartInterview = async () => {
+        setStartingInterview(true);
+        try {
+            await generateInterviewQuestionFn({ ...formData, resumeContent });
+        } catch (error) {
+            toast.error(error.message || "Failed to generate interview Question");
+        }
     }
 
-    if (step == 2) {
-        return (
-            <InterviewForm setStep={setStep} setFormData={setFormData} />
-        )
-    }
+    switch (step) {
+        case 1:
+            return (
+                <IntroductionPage setStep={setStep} />
+            )
 
-    if (step == 3) {
-        return (<ResumeSelector setResumeContent={setResumeContent} setStep={setStep} />);
-    }
+        case 2:
+            return (
+                <InterviewForm setStep={setStep} setFormData={setFormData} />
+            )
 
-    if (step == 4) {
-        return (
-            <Instructions />
-        )
+        case 3:
+            return (
+                <ResumeSelector setResumeContent={setResumeContent} setStep={setStep} />
+            )
+
+        case 4:
+            return (
+                <Instructions handleStartInterview={handleStartInterview} startingInterview={startingInterview} />
+            )
+
+        case 5:
+            return (
+                <Interview generatedInterviewData={dumyGeneratedInterviewQuestion} />
+            )
+
+        default:
+            return null;
     }
 
     return (
