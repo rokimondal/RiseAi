@@ -18,10 +18,11 @@ import InterviewForm from './InterviewForm';
 import ResumeSelector from './ResumeSelector';
 import Instructions from './Instructions';
 import { toast } from 'sonner';
+import InterviewResult from './InterviewResult';
 import Interview from './Interview';
 
 const Steps = () => {
-    const [step, setStep] = useState(5);
+    const [step, setStep] = useState(1);
     const [formData, setFormData] = useState(null);
     const [resumeContent, setResumeContent] = useState("");
     const [startingInterview, setStartingInterview] = useState(false);
@@ -113,7 +114,13 @@ const Steps = () => {
 
         case 5:
             return (
-                <Interview generatedInterviewData={dumyGeneratedInterviewQuestion} />
+                <Interview generatedInterviewData={generatedInterviewQuestion.data} setStep={setStep} />
+                // <Interviewer />
+            )
+
+        case 6:
+            return (
+                <InterviewResult />
             )
 
         default:

@@ -54,11 +54,11 @@ export async function generateInterviewQuestion({ companyName, jobTitle, jobDesc
     maskedContent = maskAll(maskedContent, twitters, PLACEHOLDERS.twitter);
 
     const prompt = `
-You are a highly experienced professional interviewer conducting a real-time AUDIO CALL interview.
+You are conducting a real professional interview via LIVE AUDIO CALL.
 
-This interview will happen via voice call, so questions must sound natural, conversational, and human-like — not robotic or written like an exam.
+This is a spoken conversation, not a written test.
 
-Your task is to design a complete interview plan.
+Your questions must sound exactly like a real, experienced interviewer speaking to a candidate.
 
 INPUTS:
 
@@ -68,68 +68,117 @@ Job Title: ${jobTitle}
 
 Interview Type: ${interviewType}
 
-Job Description: ${jobDescription}
+Job Description:
+${jobDescription}
 
-Candidate Resume: ${maskedContent}
+Candidate Resume:
+${maskedContent}
 
 
-YOUR RESPONSIBILITIES:
+PRIMARY OBJECTIVE:
 
-1. Carefully analyze:
-   - Job Title
-   - Job Description
-   - Candidate Resume
-   - Required skills
-   - Responsibilities
-   - Experience level (Junior, Mid, Senior)
+Design a realistic, structured interview plan suitable for a live voice interview.
 
-2. Based on the analysis, decide an appropriate interview duration.
 
-IMPORTANT RULES FOR DURATION:
-- Minimum duration: 15 minutes
-- Maximum duration: 60 minutes
-- Duration must be realistic for the role and experience level
-- Junior roles → shorter interviews
-- Senior roles → longer interviews
-- Complex roles → longer interviews
+CRITICAL SPEECH RULES (VERY IMPORTANT):
 
-3. Based on the selected duration, generate the appropriate number of questions.
+Questions MUST sound natural when spoken aloud.
 
-Duration → Question guideline:
+GOOD examples:
 
-- 15 min → 4–6 questions
-- 20 min → 5–8 questions
-- 30 min → 7–10 questions
-- 45 min → 10–14 questions
-- 60 min → 12–18 questions
+• "Can you walk me through your experience with Node.js?"
+• "How did you handle that situation?"
+• "What challenges did you face in that project?"
 
-4. This interview happens via AUDIO CALL, so questions must:
+BAD examples (DO NOT generate):
 
-- Sound natural and conversational
-- Be easy to speak and understand
-- Be realistic like real interviewers ask
-- Avoid overly long or robotic questions
+• "Explain Node.js."
+• "Define polymorphism."
+• "Describe the architecture of distributed systems in detail."
 
-5. Ensure proper interview flow:
+Questions must feel conversational, professional, and realistic.
 
-Order:
 
-- Introduction / warmup
-- Resume-based questions
-- Experience questions
-- Technical / problem solving questions
-- Role-specific questions
-- Behavioral / leadership questions (if applicable)
-- Closing question
+QUESTION LENGTH RULE:
 
-6. Questions must be personalized based on:
+Each question must be:
 
-- Resume
-- Job Description
-- Interview Type
-- Job Title
+• Clear
+• Concise
+• Easy to speak
+• Easy to understand
 
-7. Include follow-up questions where appropriate.
+Maximum question length: 20 words preferred, 30 words absolute maximum.
+
+
+INTERVIEW DESIGN PROCESS:
+
+Analyze carefully:
+
+• Job Title
+• Job Description
+• Resume
+• Skills
+• Experience level
+
+
+DETERMINE INTERVIEW DURATION:
+
+Minimum: 15 minutes  
+Maximum: 60 minutes  
+
+Guidelines:
+
+Junior → 15–30 minutes  
+Mid → 30–45 minutes  
+Senior → 45–60 minutes  
+
+
+QUESTION COUNT GUIDELINES:
+
+15 min → 4–6 questions  
+20 min → 5–8 questions  
+30 min → 7–10 questions  
+45 min → 10–14 questions  
+60 min → 12–18 questions  
+
+
+INTERVIEW FLOW ORDER:
+
+1. Introduction / background
+2. Resume-based questions
+3. Experience questions
+4. Technical / role-specific questions
+5. Problem solving questions
+6. Behavioral questions
+7. Closing question
+
+
+FOLLOW-UP QUESTIONS:
+
+Include follow-ups when useful.
+
+Follow-ups must also sound conversational.
+
+Example:
+
+Question:
+"Can you explain a project you worked on?"
+
+Follow-ups:
+• "What was your role?"
+• "What challenges did you face?"
+
+
+PERSONALIZATION REQUIREMENT:
+
+Questions must be personalized based on:
+
+• Resume
+• Job description
+• Role
+• Experience level
+
 
 OUTPUT FORMAT:
 
@@ -137,35 +186,38 @@ Return ONLY valid JSON.
 
 {
   "interviewPlan": {
-    "jobTitle": "{{jobTitle}}",
-    "interviewType": "{{interviewType}}",
-    "totalDuration": number, 
+    "jobTitle": "${jobTitle}",
+    "interviewType": "${interviewType}",
+    "totalDuration": number,
     "questions": [
       {
         "question": "string",
         "type": "Introduction | Technical | Behavioral | Experience | Problem Solving | Leadership",
         "difficulty": "Easy | Medium | Hard",
         "expectedAnswerTimeMinutes": number,
-        "followUps": ["string", "string"]
+        "followUps": ["string"]
       }
     ]
   }
 }
 
-IMPORTANT OUTPUT RULES:
 
-- totalDuration must be <= 60 minutes
-- totalDuration must be realistic
-- Questions must match duration
-- Questions must be conversational (audio call friendly)
-- Do NOT include explanations
-- Do NOT include anything outside JSON
-- Return ONLY JSON
+STRICT OUTPUT RULES:
 
-GOAL:
+• Output ONLY JSON
+• No explanations
+• No markdown
+• No extra text
+• totalDuration must be realistic
+• Questions must match duration
+• Questions must sound natural in spoken conversation
 
-Create a realistic, professional, and fully structured AI interview plan suitable for a real-time voice interview.
+
+FINAL GOAL:
+
+Create a realistic interview plan that sounds like it was designed by a highly experienced professional interviewer for a live voice interview.
 `;
+
 
     try {
         // console.log("prompt: ", prompt);
@@ -192,7 +244,7 @@ Create a realistic, professional, and fully structured AI interview plan suitabl
 
         console.log("interviewDetails", interviewDetails);
 
-        return { success: true, data: interviewDetails };
+        return { success: true, data: { ...interviewDetails, userName: user.name } };
     } catch (error) {
         console.error("Error generating interview question:", error);
         throw new Error("Failed to generate interview question");

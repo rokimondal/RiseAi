@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server';
 
 const isPrivateRoute = createRouteMatcher([
     '/dashboard(.*)',
-    '/resume(.*)',
+    '/preparation/(.*)',
+    '/growth-tools/(.*)',
+    '/performance',
     '/interview(.*)',
     '/ai-cover-letter(.*)',
     '/onboarding(.*)',
