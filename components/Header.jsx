@@ -47,22 +47,22 @@ const Header = async () => {
                             </Button>
                         </Link>
 
-                        <Link href={"/preparation"}>
-                            <Button variant={"ghost"} className="hover:cursor-pointer">
-                                <BookOpenText className='h-4 w-4' />
-                                <span className='hidden md:block'>Preparation</span>
-                            </Button>
-                        </Link>
-
-                        <Link href={"/growth-tools"}>
-                            <Button variant={"ghost"} className="hover:cursor-pointer mr-1">
-                                <StarsIcon className='h-4 w-4' />
-                                <span className='hidden md:block'>Growth Tools</span>
-                            </Button>
-                        </Link>
                     </SignedIn>
+                    <Link href={"/preparation"}>
+                        <Button variant={"ghost"} className="hover:cursor-pointer">
+                            <BookOpenText className='h-4 w-4' />
+                            <span className='hidden md:block'>Preparation</span>
+                        </Button>
+                    </Link>
 
-                    <HeaderAuth/>
+                    <Link href={"/growth-tools"}>
+                        <Button variant={"ghost"} className="hover:cursor-pointer mr-1">
+                            <StarsIcon className='h-4 w-4' />
+                            <span className='hidden md:block'>Growth Tools</span>
+                        </Button>
+                    </Link>
+
+                    <HeaderAuth />
                 </div>
             </nav>
 
