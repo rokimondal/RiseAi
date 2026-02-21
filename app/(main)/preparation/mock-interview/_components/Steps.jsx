@@ -91,6 +91,10 @@ const Steps = () => {
         }
     }
 
+    const handleEndInterview = async (data) => {
+        console.log(data);
+    }
+
     switch (step) {
         case 1:
             return (
@@ -114,7 +118,7 @@ const Steps = () => {
 
         case 5:
             return (
-                <Interview generatedInterviewData={generatedInterviewQuestion.data} setStep={setStep} />
+                <Interview generatedInterviewData={generatedInterviewQuestion.data} handleEndInterview={handleEndInterview} />
                 // <Interviewer />
             )
 

@@ -7,7 +7,7 @@ import Vapi from '@vapi-ai/web'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-const Interview = ({ generatedInterviewData, setStep }) => {
+const Interview = ({ generatedInterviewData, handleEndInterview }) => {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const vapiRef = useRef(null);
@@ -191,7 +191,7 @@ const Interview = ({ generatedInterviewData, setStep }) => {
     setCameraReady(false);
     setMicReady(false);
     console.log("Call end");
-    setStep(6);
+    handleEndInterview(conversation);
 
   }
 
