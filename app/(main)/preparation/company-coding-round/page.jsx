@@ -3,19 +3,19 @@ import { getUserOnboardingStatus } from '@/actions/user'
 import BackButton from '../_components/BackButton'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import InterviewPageSteps from './_components/InterviewPageSteps';
+import CodingPageSteps from './_components/CodingPageSteps';
 
-const MockInterviewPage = async () => {
+const CompanyCodingPage = async () => {
     const { isOnboarded } = await getUserOnboardingStatus();
 
     if (!isOnboarded) {
         redirect("/onboarding");
     }
 
-    const data = {
+    const data ={
         type: "normal", // normal | hiringSimulation
         resumeData: null,
-        formData: null,
+        formData:null,
     }
 
     return (
@@ -23,16 +23,17 @@ const MockInterviewPage = async () => {
             <div className='flex flex-col space-y-2 mx-2'>
                 <BackButton />
                 <div>
-                    <h1 className='text-6xl gradient-title font-bold'>Mock Interview</h1>
+                    <h1 className='text-6xl gradient-title font-bold'>Company Coding Test</h1>
                     <p className='text-muted-foreground'>
-                        Experience real interview simulations with an intelligent AI interviewer.
+                        Experience real-world coding rounds inspired by actual hiring processes.
                     </p>
                 </div>
             </div>
-            
-            <InterviewPageSteps data={data} />
+
+            {/* <Quiz /> */}
+            <CodingPageSteps data={data}/>
         </div>
     )
 }
 
-export default MockInterviewPage
+export default CompanyCodingPage

@@ -107,58 +107,60 @@ const Quiz = () => {
     const question = quizData[currentQuestion];
 
     return (
-        <Card className="mx-2">
-            <CardHeader>
-                <CardTitle className="text-muted-foreground">
-                    Question {currentQuestion + 1} of {quizData.length}
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-                <p className="text-lg font-medium">{question.question}</p>
+        <div className='fixed inset-0 z-100 bg-muted flex flex-col m-0 '>
+            <Card className="rounded-none h-screen w-full">
+                <CardHeader>
+                    <CardTitle className="text-muted-foreground">
+                        Question {currentQuestion + 1} of {quizData.length}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-5">
+                    <p className="text-lg font-medium">{question.question}</p>
 
-                <RadioGroup
-                    className="space-y-2"
-                    onValueChange={handleAnswere}
-                    value={answers[currentQuestion]}
-                >
-                    {question.options.map((option, index) => (
-                        <div className="flex items-center space-x-2" key={index}>
-                            <RadioGroupItem
-                                value={option}
-                                id={`option-${index}`}
-                                disabled={showExplanation} />
-                            <Label htmlFor={`option-${index}`}>{option}</Label>
-                        </div>
-                    ))}
-                </RadioGroup>
-
-                {showExplanation && (
-                    <div className='mt-4 p-4 bg-muted rounded-lg'>
-                        <p className='font-medium'>Explanation: </p>
-                        <p className='text-muted-foreground'>{question.explanation}</p>
-                    </div>
-                )}
-            </CardContent>
-            <CardFooter>
-                {!showExplanation && (
-                    <Button
-                        onClick={() => setShowExplanation(true)}
-                        variant="outline"
-                        disabled={!answers[currentQuestion]}
+                    <RadioGroup
+                        className="space-y-2"
+                        onValueChange={handleAnswere}
+                        value={answers[currentQuestion]}
                     >
-                        Show Explanation
-                    </Button>
-                )}
+                        {question.options.map((option, index) => (
+                            <div className="flex items-center space-x-2" key={index}>
+                                <RadioGroupItem
+                                    value={option}
+                                    id={`option-${index}`}
+                                    disabled={showExplanation} />
+                                <Label htmlFor={`option-${index}`}>{option}</Label>
+                            </div>
+                        ))}
+                    </RadioGroup>
 
-                <Button
-                    onClick={handleNextQuestion}
-                    className="ml-auto flex text-center"
-                    disabled={!answers[currentQuestion] || savingResult}
-                >
-                    {savingResult ? <Loader2 className='h-4 w-4 animate-spin' /> : currentQuestion < quizData.length - 1 ? "Next Question" : "Finish Quiz"}
-                </Button>
-            </CardFooter>
-        </Card>
+                    {showExplanation && (
+                        <div className='mt-4 p-4 bg-muted rounded-lg'>
+                            <p className='font-medium'>Explanation: </p>
+                            <p className='text-muted-foreground'>{question.explanation}</p>
+                        </div>
+                    )}
+                </CardContent>
+                <CardFooter>
+                    {!showExplanation && (
+                        <Button
+                            onClick={() => setShowExplanation(true)}
+                            variant="outline"
+                            disabled={!answers[currentQuestion]}
+                        >
+                            Show Explanation
+                        </Button>
+                    )}
+
+                    <Button
+                        onClick={handleNextQuestion}
+                        className="ml-auto flex text-center"
+                        disabled={!answers[currentQuestion] || savingResult}
+                    >
+                        {savingResult ? <Loader2 className='h-4 w-4 animate-spin' /> : currentQuestion < quizData.length - 1 ? "Next Question" : "Finish Quiz"}
+                    </Button>
+                </CardFooter>
+            </Card>
+        </div>
     )
 }
 

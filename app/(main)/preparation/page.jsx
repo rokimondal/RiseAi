@@ -8,7 +8,9 @@ import {
     Lock,
     Briefcase,
     Calculator,
-    FileQuestion
+    FileQuestion,
+    Laptop,
+    ClipboardCheck
 } from "lucide-react"
 
 const preparationTools = [
@@ -34,7 +36,21 @@ const preparationTools = [
         href: "/preparation/company-simulation",
         status: "available"
     },
-
+    {
+        title: "Assessment Center",
+        description: "Practice company-style assessments with MCQs, multi-select, short answers, and situational questions.",
+        icon: ClipboardCheck,
+        href: "/preparation/assessment-center",
+        status: "available"
+    },
+    {
+        title: "Company Coding Round",
+        description: "Solve timed coding challenges tailored to company hiring rounds and specific engineering roles.",
+        icon: Laptop,
+        href: "/preparation/company-coding-round",
+        status: "available"
+    },
+    
     // 🚧 Upcoming
     {
         title: "Aptitude Test",
@@ -62,7 +78,7 @@ export default function PreparationPage() {
 
             {/* Available Section */}
             <div className="space-y-6">
-                <h2 className="text-2xl font-semibold">Available Now</h2>
+                {/* <h2 className="text-2xl font-semibold">Available Now</h2> */}
 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {preparationTools
