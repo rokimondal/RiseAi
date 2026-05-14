@@ -14,7 +14,29 @@ export default function ResumeDropzone({ onUpload }) {
     const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
 
         if (rejectedFiles.length > 0) {
-            toast.error("Invalid file type");
+            const errors = rejectedFiles[0].errors;
+
+            errors.forEach((error) => {
+                switch (error.code) {
+
+                    case "file-too-large":
+                        toast.error("File size must be less than 2MB");
+                        break;
+
+                    case "file-invalid-type":
+                        toast.error("Invalid file type. Please upload PDF, DOC, DOCX, TXT, JSON, or HTML.");
+                        break;
+
+                    case "too-many-files":
+                        toast.error("Only one file is allowed");
+                        break;
+
+                    default:
+                        toast.error("File upload failed. Please try again.");
+                }
+            });
+
+            return;
             return;
         }
 
@@ -33,6 +55,7 @@ export default function ResumeDropzone({ onUpload }) {
         multiple: false,
 
         maxFiles: 1,
+        maxSize: 2 * 1024 * 1024,
 
         accept: {
             "application/pdf": [".pdf"],

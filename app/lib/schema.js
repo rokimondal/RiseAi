@@ -73,9 +73,9 @@ export const coverLetterSchema = z.object({
 })
 
 export const interviewSchema = z.object({
-    companyName: z.string().min(1, "Company name is required"),
-    jobTitle: z.string().min(1, "Job title is required"),
-    jobDescription: z.string().min(1, "Job description is required"),
+    companyName: z.string().trim().min(1, "Company name is required"),
+    jobTitle: z.string().trim().min(1, "Job title is required"),
+    jobDescription: z.string().trim().min(1, "Job description is required"),
     interviewType: z.enum(
         ["Technical", "HR", "Behavioral", "System Design", "Coding", "Mixed"],
         {
@@ -83,3 +83,120 @@ export const interviewSchema = z.object({
         }
     ),
 })
+
+
+
+const programmingLanguageField = z.enum(
+    ["Java", "CPP", "Python", "JavaScript", "C"],
+    {
+        required_error: "Programming Language is required",
+    }
+);
+
+const roleBasedSchema = z.object({
+    assessmentMode: z.literal("ROLE_BASED"),
+
+    companyName: z.string().trim().min(1, "Company name is required"),
+
+    role: z.string().trim().min(1, "Role is required"),
+
+    experienceLevel: z.enum(
+        ["Intern", "Fresher", "1–3 Years", "3–5 Years", "Senior"],
+        {
+            required_error: "Experience Level is required",
+        }
+    ),
+
+    programmingLanguage: programmingLanguageField,
+
+    hiringType: z.enum(
+        ["On-Campus", "Off-Campus", "Lateral"],
+        {
+            required_error: "Hiring Type is required",
+        }
+    ),
+});
+
+const examSchema = z.object({
+    assessmentMode: z.literal("COMPANY_EXAM"),
+
+    companyName: z.string().trim().min(1, "Company name is required"),
+
+    examName: z.string().trim().min(1, "Exam name is required"),
+
+    programmingLanguage: programmingLanguageField,
+});
+
+export const codingTestSchema = z.discriminatedUnion(
+    "assessmentMode",
+    [roleBasedSchema, examSchema]
+);
+
+
+const assessmentRoleBasedSchema = z.object({
+    assessmentMode: z.literal("ROLE_BASED"),
+
+    companyName: z
+        .string()
+        .trim()
+        .min(1, "Company name is required"),
+
+    role: z
+        .string()
+        .trim()
+        .min(1, "Role is required"),
+
+    experienceLevel: z.enum(
+        ["Intern", "Fresher", "1–3 Years", "3–5 Years", "Senior"],
+        {
+            required_error: "Experience Level is required",
+        }
+    ),
+
+    hiringType: z.enum(
+        ["On-Campus", "Off-Campus", "Lateral"],
+        {
+            required_error: "Hiring Type is required",
+        }
+    ),
+
+    roundType: z.enum(
+        [
+            "Assessment Round",
+            "Technical Screening",
+            "Aptitude Round",
+            "HR Round",
+            "Behavioral Round",
+            "Managerial Round"
+        ],
+        {
+            required_error: "Round Type is required",
+        }
+    ),
+});
+
+const assessmentExamBasedSchema = z.object({
+    assessmentMode: z.literal("EXAM_BASED"),
+
+    examAuthority: z
+        .string()
+        .trim()
+        .min(1, "Exam authority is required"),
+
+    examName: z
+        .string()
+        .trim()
+        .min(1, "Exam name is required"),
+
+    selectedTopics: z
+        .array(z.string())
+        .optional()
+});
+
+export const assessmentCenterSchema = z.discriminatedUnion(
+    "assessmentMode",
+    [
+        assessmentRoleBasedSchema,
+        assessmentExamBasedSchema
+    ]
+);

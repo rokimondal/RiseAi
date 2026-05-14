@@ -9,21 +9,24 @@ datasource db {
 }
 
 model User {
-  id              String           @id @default(uuid())
-  clerkUserId     String           @unique
-  email           String           @unique
-  name            String?
-  imageUrl        String?
-  industry        String?
-  createdAt       DateTime         @default(now())
-  updateAt        DateTime         @updatedAt
-  bio             String?
-  experience      Int?
-  skills          String[]
-  assessments     Assessment[]
-  coverLetter     CoverLetter[]
-  resume          Resume?
-  industryInsight IndustryInsight? @relation(fields: [industry], references: [industry])
+  id                 String              @id @default(uuid())
+  clerkUserId        String              @unique
+  email              String              @unique
+  name               String?
+  imageUrl           String?
+  industry           String?
+  createdAt          DateTime            @default(now())
+  updateAt           DateTime            @updatedAt
+  bio                String?
+  experience         Int?
+  skills             String[]
+  assessments        Assessment[]
+  coverLetter        CoverLetter[]
+  appliedJobs        AppliedJob[]
+  simulationSessions SimulationSession[]
+  simulationResults  SimulationResult[]
+  resume             Resume?
+  industryInsight    IndustryInsight?    @relation(fields: [industry], references: [industry])
 }
 
 model Assessment {
@@ -81,6 +84,70 @@ model IndustryInsight {
   users             User[]
 
   @@index([industry])
+}
+
+model AppliedJob {
+  id            String            @id @default(cuid())
+  userId        String
+  externalJobId String
+  source        String
+  title         String
+  company       String
+  location      String?
+  description   String?
+  applyLink     String
+  companyLogo   String?
+  status        ApplicationStatus @default(APPLIED)
+  notes         String?
+  appliedAt     DateTime          @default(now())
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  user          User              @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([externalJobId])
+}
+
+model SimulationSession {
+  id        String         @id @default(cuid())
+  sessionId String         @unique
+  userId    String
+  type      SimulationType
+  payload   Json?
+  expiresAt DateTime?
+  createdAt DateTime       @default(now())
+  user      User           @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model SimulationResult {
+  id             String         @id @default(cuid())
+  userId         String
+  type           SimulationType
+  score          Float
+  metadata       Json?
+  result         Json?
+  improvementTip String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  user           User           @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+enum ApplicationStatus {
+  SAVED
+  APPLIED
+  REJECTED
+  OFFER
+}
+
+enum SimulationType {
+  MOCK_INTERVIEW
+  COMPANY_SIMULATION
+  CODING_ROUND
+  ASSESSMENT_CENTER
 }
 
 enum DemandLevel {

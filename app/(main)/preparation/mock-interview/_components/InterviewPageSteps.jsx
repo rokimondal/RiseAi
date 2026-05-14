@@ -21,60 +21,62 @@ import { toast } from 'sonner';
 import InterviewResult from './InterviewResult';
 import Interview from './Interview';
 
-const Steps = () => {
+const InterviewPageSteps = ({ data }) => {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState(null);
     const [resumeContent, setResumeContent] = useState("");
-    const [startingInterview, setStartingInterview] = useState(false);
+    const [conversation, setConversation] = useState([]);
 
     const { loading: generating, fn: generateInterviewQuestionFn, data: generatedInterviewQuestion } = useFetch(generateInterviewQuestion);
 
-    useEffect(() => {
-        console.log("formdata: ", formData);
-        console.log("resumeContent: ", resumeContent);
-    }, [formData, resumeContent]);
-
-    const dumyGeneratedInterviewQuestion = {
-        "interviewType": "Technical",
-        "jobTitle": "Software Developer Engineer I",
-        "totalDuration": 1.1,
-        "questions": [
-            {
-                "id": "q1",
-                "question": "Tell me about yourself and your background in software development.",
-                "type": "Introduction",
-                "difficulty": "Easy",
-                "expectedAnswerTimeMinutes": 2,
-                "skillsTested": ["Communication", "Self-awareness"],
-                "followUps": []
-            },
-            {
-                "id": "q2",
-                "question": "Explain how JWT authentication works in a MERN stack application.",
-                "type": "Technical",
-                "difficulty": "Medium",
-                "expectedAnswerTimeMinutes": 5,
-                "skillsTested": ["Authentication", "Backend", "Security"],
-                "followUps": [
-                    "How do you handle token expiration?",
-                    "What are the security risks of JWT?"
-                ]
-            }
-        ]
-    }
 
     // useEffect(() => {
-    //     if (generatedInterviewQuestion) {
-    //     }
-    // }, [generatedInterviewQuestion])
+    //     console.log("formdata: ", formData);
+    //     console.log("resumeContent: ", resumeContent);
+    // }, [formData, resumeContent]);
 
-    // const onSubmit = async (data) => {
-    //     try {
-    //         await generateInterviewQuestionFn(data);
-    //     } catch (error) {
-    //         toast.error(error.message || "Failed to generate cover letter");
-    //     }
-    // }
+    const dumyGeneratedInterviewQuestion = {
+        //     "interviewType": "Technical",
+        //     "jobTitle": "Software Developer Engineer I",
+        //     "totalDuration": 1.1,
+        //     "questions": [
+        //         {
+        //             "id": "q1",
+        //             "question": "Tell me about yourself and your background in software development.",
+        //             "type": "Introduction",
+        //             "difficulty": "Easy",
+        //             "expectedAnswerTimeMinutes": 2,
+        //             "skillsTested": ["Communication", "Self-awareness"],
+        //             "followUps": []
+        //         },
+        //         {
+        //             "id": "q2",
+        //             "question": "Explain how JWT authentication works in a MERN stack application.",
+        //             "type": "Technical",
+        //             "difficulty": "Medium",
+        //             "expectedAnswerTimeMinutes": 5,
+        //             "skillsTested": ["Authentication", "Backend", "Security"],
+        //             "followUps": [
+        //                 "How do you handle token expiration?",
+        //                 "What are the security risks of JWT?"
+        //             ]
+        //         }
+        //     ]
+        // }
+
+        // useEffect(() => {
+        //     if (generatedInterviewQuestion) {
+        //     }
+        // }, [generatedInterviewQuestion])
+
+        // const onSubmit = async (data) => {
+        //     try {
+        //         await generateInterviewQuestionFn(data);
+        //     } catch (error) {
+        //         toast.error(error.message || "Failed to generate cover letter");
+        //     }
+    }
+
 
     useEffect(() => {
         if (generatedInterviewQuestion) {
@@ -83,7 +85,6 @@ const Steps = () => {
     }, [generatedInterviewQuestion])
 
     const handleStartInterview = async () => {
-        setStartingInterview(true);
         try {
             await generateInterviewQuestionFn({ ...formData, resumeContent });
         } catch (error) {
@@ -98,7 +99,7 @@ const Steps = () => {
     switch (step) {
         case 1:
             return (
-                <IntroductionPage setStep={setStep} />
+                <IntroductionPage setStep={setStep} data={data} />
             )
 
         case 2:
@@ -113,12 +114,12 @@ const Steps = () => {
 
         case 4:
             return (
-                <Instructions handleStartInterview={handleStartInterview} startingInterview={startingInterview} />
+                <Instructions handleStartInterview={handleStartInterview} startingInterview={generating} />
             )
 
         case 5:
             return (
-                <Interview generatedInterviewData={generatedInterviewQuestion.data} handleEndInterview={handleEndInterview} />
+                <Interview generatedInterviewData={generatedInterviewQuestion.data} handleEndInterview={handleEndInterview} setConversation={setConversation} conversation={conversation} />
                 // <Interviewer />
             )
 
@@ -136,4 +137,4 @@ const Steps = () => {
     )
 }
 
-export default Steps
+export default InterviewPageSteps

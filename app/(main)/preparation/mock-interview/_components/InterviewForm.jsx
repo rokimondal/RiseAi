@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react'
 import { useForm } from 'react-hook-form';
 
-const InterviewForm = ({ setStep, setFormData }) => {
+const InterviewForm = ({ setStep, setFormData}) => {
 
     const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({ resolver: zodResolver(interviewSchema) });
 
@@ -75,7 +75,7 @@ const InterviewForm = ({ setStep, setFormData }) => {
                             }
                         >
                             <SelectTrigger id="interviewType" className="w-full">
-                                <SelectValue placeholder="Interview Type" />
+                                <SelectValue placeholder="Select Interview Type" />
                             </SelectTrigger>
                             <SelectContent>
                                 {interviewTypes.map((type) => (
@@ -84,7 +84,7 @@ const InterviewForm = ({ setStep, setFormData }) => {
                             </SelectContent>
                         </Select>
                         {errors.interviewType && (
-                            <p className="text-sm text-red-500">{errors.interviewType.message}</p>
+                            <p className="text-sm text-red-500">Interview type is required</p>
                         )}
                     </div>
 
