@@ -56,7 +56,7 @@
     "font": "^0.0.4",
     "framer-motion": "^12.23.22",
     "i": "^0.3.7",
-    "inngest": "^3.44.0",
+    "inngest": "^4.4.0",
     "lodash.throttle": "^4.1.1",
     "lucide-react": "^0.544.0",
     "mammoth": "^1.11.0",
