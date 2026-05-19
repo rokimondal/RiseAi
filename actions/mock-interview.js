@@ -243,8 +243,34 @@ Create a realistic interview plan that sounds like it was designed by a highly e
         }
 
         console.log("interviewDetails", interviewDetails);
+        let simulationSession ;
+        try {
 
-        return { success: true, data: { ...interviewDetails, userName: user.name } };
+            simulationSession = await db.simulationSession.create({
+                data: {
+                    userId: user.id,
+                    type: "MOCK_INTERVIEW",
+                    status: "STARTED",
+                    startedAt: new Date(),
+
+                    payload: {
+                        companyName,
+                        jobTitle,
+                        jobDescription,
+                        interviewType,
+                        interviewPlan: interviewDetails,
+                    },
+
+                    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
+                },
+            });
+        } catch (error) {
+            console.error("Simulation session creation error:", error);
+
+            throw new Error("Failed to create simulation session");
+        }
+
+        return { success: true, data: { sessionId: simulationSession.id, ...interviewDetails, userName: user.name } };
     } catch (error) {
         console.error("Error generating interview question:", error);
         throw new Error("Failed to generate interview question");
