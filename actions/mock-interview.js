@@ -26,9 +26,6 @@ export async function generateInterviewQuestion({ companyName, jobTitle, jobDesc
         where: {
             clerkUserId: userId,
         },
-        include: {
-            industryInsight: true,
-        },
     })
 
     if (!user) throw new Error("User not exist");
@@ -300,13 +297,9 @@ Create a realistic interview plan that sounds like it was designed by a highly e
             simulationSession = await db.simulationSession.create({
                 data: {
                     userId: user.id,
-
                     type: "MOCK_INTERVIEW",
-
                     status: "STARTED",
-
-                    creditsUsed: INTERVIEW_GENERATION_CREDITS,
-
+                    creditsUsed:  INTERVIEW_GENERATION_CREDITS,
                     payload: {
                         companyName,
                         jobTitle,
@@ -367,9 +360,6 @@ export async function EvaluateInterview({ interviewConversation, sessionToken, t
     const user = await db.user.findUnique({
         where: {
             clerkUserId: userId,
-        },
-        include: {
-            industryInsight: true,
         },
     })
 
@@ -841,9 +831,7 @@ STRICT OUTPUT RULES
     }
 }
 
-export async function StartExistingInterviewSession({
-    sessionToken,
-}) {
+export async function StartExistingInterviewSession({ sessionToken }) {
 
     const { userId } = await auth();
 
@@ -854,10 +842,6 @@ export async function StartExistingInterviewSession({
     const user = await db.user.findUnique({
         where: {
             clerkUserId: userId,
-        },
-
-        include: {
-            industryInsight: true,
         },
     });
 
@@ -978,12 +962,12 @@ export async function StartExistingInterviewSession({
     } catch (error) {
 
         console.error(
-            "Error restarting interview:",
+            "Error starting interview:",
             error
         );
 
         throw new Error(
-            "Failed to restart interview"
+            "Failed to start interview"
         );
     }
 }
@@ -1001,10 +985,6 @@ export async function EvaluatePendingInterview({
     const user = await db.user.findUnique({
         where: {
             clerkUserId: userId,
-        },
-
-        include: {
-            industryInsight: true,
         },
     });
 

@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { Button } from './ui/button'
-import { BookOpenText, ChartSpline, ChevronDown, FileText, GraduationCap, LayoutDashboard, PenBox, StarsIcon } from 'lucide-react'
+import { BookOpenText, BriefcaseBusiness, ChartSpline, ChevronDown, FileText, GraduationCap, LayoutDashboard, PenBox, StarsIcon } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { checkUser } from '@/lib/checkUser'
 import { ModeToggle } from './ModeToggle'
@@ -48,6 +48,12 @@ const Header = async () => {
                         </Link>
 
                     </SignedIn>
+                    <Link href={"/jobs"}>
+                        <Button variant={"ghost"} className="hover:cursor-pointer">
+                            <BriefcaseBusiness className='h-4 w-4' />
+                            <span className='hidden md:block'>Jobs</span>
+                        </Button>
+                    </Link>
                     <Link href={"/preparation"}>
                         <Button variant={"ghost"} className="hover:cursor-pointer">
                             <BookOpenText className='h-4 w-4' />

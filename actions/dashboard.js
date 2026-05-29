@@ -22,7 +22,8 @@ export async function generateAIInsights(industry) {
             "topSkills": ["skill1", "skill2"],
             "marketOutlook": "POSITIVE" | "NEUTRAL" | "NEGATIVE",
             "keyTrends": ["trend1", "trend2"],
-            "recommendedSkills": ["skill1", "skill2"]
+            "recommendedSkills": ["skill1", "skill2"],
+            "jobSearchKeywords": ["keyword1","keyword2"]
           }
 
           IMPORTANT: Return ONLY the JSON. No additional text, notes, or markdown formatting.

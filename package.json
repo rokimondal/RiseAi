@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "clean": "rm -rf .next",
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
@@ -49,6 +50,8 @@
     "@tiptap/starter-kit": "^3.6.6",
     "@types/react-color": "^3.0.13",
     "@vapi-ai/web": "^2.5.2",
+    "axios": "^1.16.1",
+    "cheerio": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "color": "^5.0.2",

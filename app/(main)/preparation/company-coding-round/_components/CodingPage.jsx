@@ -1,6 +1,6 @@
 "use client"
 
-import { runCode } from '@/actions/company-coding-round'
+import { EvaluateCodingAssessment, runCode } from '@/actions/company-coding-round'
 import { Button } from '@/components/ui/button'
 import useFetch from '@/hooks/use-fetch'
 import { Editor } from '@monaco-editor/react'
@@ -9,7 +9,7 @@ import { useTheme } from 'next-themes'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-const CodingPage = ({ assesmentData }) => {
+const CodingPage = ({ assesmentData, setAssessmentResult }) => {
 
   const { resolvedTheme } = useTheme();
 
@@ -40,6 +40,7 @@ const CodingPage = ({ assesmentData }) => {
   const hasCustom = allTestCases.length > baseCount;
 
   const { loading: executing, fn: executionFn, data: executionResult } = useFetch(runCode);
+  const { loading: submiting, fn: submitionFn, data: submitionResult } = useFetch(EvaluateCodingAssessment);
 
 
   useEffect(() => {
@@ -104,6 +105,7 @@ const CodingPage = ({ assesmentData }) => {
 
   useEffect(() => {
     if (!executionResult) return;
+    if (executionResult.questionId !== currentQuestion.id) return;
 
     console.log(executionResult)
     if (!executionResult.success) {
@@ -154,22 +156,62 @@ const CodingPage = ({ assesmentData }) => {
     }
 
     const fullCode = combineWrapperAndUserCode(currentQuestion.systemWrapperCode, userCode);
-    console.log(fullCode)
 
     const fullInput = prepareTestCasesInput(allTestCases, true)
-    console.log(fullInput);
     try {
       await executionFn({
         code: fullCode,
         language: assesmentData?.assessmentMetadata?.programmingLanguage,
         input: fullInput,
-        questionId: currentQuestion.id
+        questionId: currentQuestion.id,
+        sessionToken: assesmentData.sessionToken,
       });
       // setLastExecutedQuestionId(currentQuestion.id);
     } catch (error) {
       console.error(error);
       toast.error(error.message || "Failed to Execute your code");
     }
+
+  }
+
+  useEffect(() => {
+
+    if (submitionResult?.success) {
+      console.log(submitionResult);
+      setAssessmentResult(submitionResult);
+    }
+
+  }, [submitionResult]);
+
+  const handleSubmitCode = async () => {
+    try {
+      const codes = assesmentData.questions.map(
+          (question) => ({
+            questionId: question.id,
+
+            language:
+              assesmentData
+                ?.assessmentMetadata
+                ?.programmingLanguage,
+
+            code:
+              codeMap[question.id] || "",
+          })
+        );
+
+      const timeTaken =
+        (totalDuration * 60) - timeLeft;
+
+      await submitionFn({
+        codes,
+        sessionToken: assesmentData.sessionToken,
+        timeTaken
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error(error.message || "Failed to Execute your code");
+    }
+
 
   }
 
@@ -237,7 +279,7 @@ const CodingPage = ({ assesmentData }) => {
               variant="outline"
               className="flex items-center gap-2"
               onClick={() => handleRunCode()}
-              disabled={executing}
+              disabled={executing || submiting}
             >{executing ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <><Play className="w-4 h-4" />
               Run</>}
 
@@ -245,9 +287,11 @@ const CodingPage = ({ assesmentData }) => {
 
             <Button
               className="flex items-center gap-2"
+              onClick={() => handleSubmitCode()}
+              disabled={submiting}
             >
-              <Send className="w-4 h-4" />
-              Submit
+              {submiting ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <><Send className="w-4 h-4" />
+                Submit</>}
             </Button>
           </div>
         </div>
@@ -613,7 +657,16 @@ function prepareTestCasesInput(testCases, includeHidden = true) {
       if (!tc.input || typeof tc.input !== "string") {
         throw new Error("Each test case must contain valid input.");
       }
-      return tc.input.trim();
+      let cleanedInput = tc.input.trim();
+
+      if (
+        cleanedInput.startsWith('\"') &&
+        cleanedInput.endsWith('\"')
+      ) {
+        cleanedInput = cleanedInput.slice(1, -1);
+      }
+
+      return cleanedInput;
     })
     .join("\n###TESTCASE###\n");
 }

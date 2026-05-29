@@ -87,7 +87,7 @@ export const interviewSchema = z.object({
 
 
 const programmingLanguageField = z.enum(
-    ["Java", "CPP", "Python", "JavaScript", "C"],
+    [ "Java", "CPP", "Python", "JavaScript", "C", "typescript", "go", "rust", "ruby", "php" ],
     {
         required_error: "Programming Language is required",
     }

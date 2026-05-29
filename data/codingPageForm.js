@@ -12,6 +12,11 @@ export const programmingLanguages = [
     "Python",
     "JavaScript",
     "C",
+    "typescript",
+    "go",
+    "rust",
+    "ruby",
+    "php"
 ];
 
 export const hiringTypes = [
