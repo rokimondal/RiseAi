@@ -34,7 +34,7 @@ const preparationTools = [
         description: "Simulate complete hiring rounds based on real company patterns and difficulty levels.",
         icon: Building2,
         href: "/preparation/company-simulation",
-        status: "available"
+        status: "upcoming"
     },
     {
         title: "Assessment Center",

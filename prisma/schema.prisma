@@ -83,6 +83,7 @@ model IndustryInsight {
   lastUpdated       DateTime      @default(now())
   nextUpdate        DateTime
   keyTrends         String[]
+  jobSearchKeywords String[]
   users             User[]
 
   @@index([industry])

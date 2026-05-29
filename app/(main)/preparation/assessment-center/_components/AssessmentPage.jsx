@@ -104,6 +104,12 @@ const AssessmentPage = ({ assessmentData, handleSubmit, loading }) => {
   }
 
   const handleFinalSubmit = () => {
+    const timeTaken = (totalDuration * 60) - timeLeft;
+    handleSubmit({
+      userAnswers: questionWithAnswere,
+      sessionToken: assessmentData.sessionToken,
+      timeTaken
+    })
     console.log(questionWithAnswere);
   }
 
