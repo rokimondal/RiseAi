@@ -19,12 +19,27 @@ const Interview = ({ generatedInterviewData, handleEndInterview }) => {
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
   const [conversation, setConversation] = useState([]);
+  const hasEndedRef = useRef(false);
 
 
   useEffect(() => {
     setMounted(true);
   }, [])
 
+
+  useEffect(() => {
+
+    const handleUnload = () => {
+      handleEndCall();
+    };
+
+    window.addEventListener("beforeunload", handleUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+    };
+
+  }, []);
 
 
   useEffect(() => {
@@ -177,30 +192,38 @@ const Interview = ({ generatedInterviewData, handleEndInterview }) => {
 
 
   const handleEndCall = () => {
-    if (vapiRef.current) {
-      vapiRef.current.stop();
-    }
-    if (intervalRef.current) {
-      console.log(intervalRef.current);
-      clearInterval(intervalRef.current);
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
+    if (hasEndedRef.current) return;
 
-    setConnected(false);
-    setCameraReady(false);
-    setMicReady(false);
-    console.log("Call end");
-    handleEndInterview(conversation);
+    hasEndedRef.current = true;
+    try {
+      if (vapiRef.current) {
+        vapiRef.current.stop();
+      }
+      if (intervalRef.current) {
+        console.log(intervalRef.current);
+        clearInterval(intervalRef.current);
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
 
+      setConnected(false);
+      setCameraReady(false);
+      setMicReady(false);
+      console.log("Call end");
+
+      handleEndInterview({ conversation, timeTaken: generatedInterviewData.totalDuration * 60 - timeLeft });
+
+      console.log(generatedInterviewData);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  console.log(generatedInterviewData);
 
   return (
     <div className="fixed inset-0 z-[100] bg-muted flex items-center justify-center ">

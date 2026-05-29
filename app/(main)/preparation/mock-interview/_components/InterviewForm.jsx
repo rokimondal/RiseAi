@@ -36,7 +36,7 @@ const InterviewForm = ({ setStep, setFormData}) => {
 
 
                         <div className="space-y-2">
-                            <Label htmlFor="companyName">Company Name</Label>
+                            <Label htmlFor="companyName">Company / Exam Authority</Label>
                             <Input
                                 id="companyName"
                                 placeholder="Enter company name"
@@ -50,7 +50,7 @@ const InterviewForm = ({ setStep, setFormData}) => {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="jobTitle">Job Title</Label>
+                            <Label htmlFor="jobTitle">Role / Exam Name</Label>
                             <Input
                                 id="jobTitle"
                                 placeholder="Enter job title"
