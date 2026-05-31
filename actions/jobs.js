@@ -8,7 +8,10 @@ import { db } from "@/lib/prisma";
 
 export async function getJobs() {
     const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    if (!userId) {
+        const jobsData = await linkedinJobs(buildURILinkedin({}));
+        return jobsData;
+    }
 
     const user = await db.user.findUnique({
         where: {
@@ -19,13 +22,8 @@ export async function getJobs() {
         },
     })
 
-    if (!user) {
-        const jobsData = await linkedinJobs(buildURILinkedin());
+    if (!user) throw new Error("User not exist")
 
-        console.log(jobsData);
-
-        return jobsData;
-    }
 
     let industryInsight = user.industryInsight;
     console.log(industryInsight);
@@ -43,8 +41,6 @@ export async function getJobs() {
         }
 
         const jobsData = await linkedinJobs(buildURILinkedin({ keywords: industryInsight.jobSearchKeywords }));
-
-        console.log(jobsData);
 
         return jobsData;
 
@@ -79,7 +75,87 @@ export async function getJob({ url }) {
         throw new Error(`Unsupported job source: ${hostname}`);
     }
 
-    return await provider.handler(decodedUrl);
+    const jobData = await provider.handler(decodedUrl);
+
+    const { userId } = await auth();
+
+    if (!userId) {
+        return { ...jobData, isApplied: false }
+    }
+
+    const user = await db.user.findUnique({
+        where: {
+            clerkUserId: userId,
+        },
+    })
+
+    if (!user) throw new Error("User not exist");
+
+    const appliedJob = await db.appliedJob.findFirst({
+        where: {
+            userId: user.id,
+            externalJobId: `${jobData.source}-${jobData.externalJobId}`,
+        },
+    });
+    console.log(jobData);
+    console.log(appliedJob);
+    return { ...jobData, isApplied: !!appliedJob };
+}
+
+export async function markJobAsApplied(job) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Please sign in first");
+
+    const user = await db.user.findUnique({
+        where: {
+            clerkUserId: userId,
+        },
+    })
+
+    if (!user) throw new Error("User not exist");
+
+    if (
+        !job ||
+        !job.source ||
+        !job.externalJobId ||
+        !job.title?.trim() ||
+        !job.company?.trim() ||
+        !job.applyLink?.trim()
+    ) {
+        throw new Error("Invalid job data");
+    }
+
+
+
+    try {
+        const appliedJob = await db.appliedJob.create({
+            data: {
+                userId: user.id,
+                externalJobId: `${job.source}-${job.externalJobId}`,
+                source: job.source || "linkedin",
+                title: job.title,
+                company: job.company,
+                location: job.location || "",
+                description: job.description || "",
+                applyLink: job.applyLink,
+                companyLogo: job.companyLogo || "",
+                status: "APPLIED",
+            },
+        })
+
+        return {
+            success: true,
+            data: appliedJob,
+        };
+
+    } catch (error) {
+        console.error("Error marking job as applied:", error);
+        throw new Error("Failed to mark job as applied");
+    }
+}
+
+export async function getFilteredJobs(filters) {
+    return await linkedinJobs(buildURILinkedin({ ...filters }));
 }
 
 async function getLinkedInJob(url) {
@@ -103,7 +179,6 @@ async function getLinkedInJob(url) {
     }
 }
 
-
 async function linkedinJobs(url) {
     try {
         const { data: html } = await axios.get(url, {
@@ -125,14 +200,23 @@ async function linkedinJobs(url) {
     }
 }
 
-function buildURILinkedin({ seconds = 0, keywords = [], location = "india", experienceLevel = "", remote = "", jobType = "", easyApply = "" }) {
+function buildURILinkedin({ datePosted = "24h", keywords = [], location = "india", experienceLevel = "", workMode = "", jobType = "", easyApply = "" }) {
 
     let url = "https://www.linkedin.com/jobs/search/?"
 
-    if (seconds != 0) {
-        url += `f_TPR=r${seconds}`
-    } else {
-        url += `f_TPR=r86400`
+    const DATE_POSTED_MAP = {
+        all: 0,
+        "24h": 86400,
+        "3d": 259200,
+        "7d": 604800,
+        "14d": 1209600,
+        "30d": 2592000,
+    };
+
+    const seconds = DATE_POSTED_MAP[datePosted];
+
+    if (seconds) {
+        url += `f_TPR=r${seconds}`;
     }
 
     const encodedKeyword = buildLinkedInKeywords(keywords);
@@ -150,47 +234,53 @@ function buildURILinkedin({ seconds = 0, keywords = [], location = "india", expe
         // Transform experience levels to LinkedIn codes
         // Internship -> 1, Entry level -> 2, Associate -> 3
         // Mid-Senior level -> 4, Director -> 5, Executive -> 6
-        const transformedExperiences = experienceLevel
-            .split(",")
-            .map((exp) => {
-                switch (exp.trim()) {
-                    case "Internship": return "1";
-                    case "Entry level": return "2";
-                    case "Associate": return "3";
-                    case "Mid-Senior level": return "4";
-                    case "Director": return "5";
-                    case "Executive": return "6";
-                    default: return "";
-                }
-            })
-            .filter(Boolean);
-        url += `&f_E=${transformedExperiences.join(",")}`;
+
+        const EXPERIENCE_MAP = {
+            "internship": "1",
+            "fresher": "2",
+            "1-3": "3",
+            "3-5": "4",
+            "5-10": "5",
+            "10+": "6",
+        };
+        const code = EXPERIENCE_MAP[experienceLevel];
+
+        if (code) {
+            url += `&f_E=${code}`;
+        }
     }
 
-    if (remote != "") {
+    if (workMode != "") {
         // Transform remote options to LinkedIn codes
         // On-Site -> 1, Remote -> 2, Hybrid -> 3
-        const transformedRemote = remote
-            .split(",")
-            .map((e) => {
-                switch (e.trim()) {
-                    case "Remote": return "2";
-                    case "Hybrid": return "3";
-                    case "On-Site": return "1";
-                    default: return "";
-                }
-            })
-            .filter(Boolean);
-        url += `&f_WT=${transformedRemote.join(",")}`;
+        const WORK_MODE_MAP = {
+            remote: "2",
+            hybrid: "3",
+            onsite: "1",
+        };
+
+        const code = WORK_MODE_MAP[workMode];
+
+        if (code) {
+            url += `&f_WT=${code}`;
+        }
     }
 
     if (jobType != "") {
         // Transform job types to LinkedIn codes
         // Full-time -> F, Part-time -> P, Contract -> C, etc.
-        const transformedJobType = jobType
-            .split(",")
-            .map((type) => type.trim().charAt(0).toUpperCase());
-        url += `&f_JT=${transformedJobType.join(",")}`;
+        const JOB_TYPE_MAP = {
+            "full-time": "F",
+            "part-time": "P",
+            contract: "C",
+            internship: "I",
+        };
+
+        const code = JOB_TYPE_MAP[jobType];
+
+        if (code) {
+            url += `&f_JT=${code}`;
+        }
     }
 
     if (easyApply != "") {
@@ -289,7 +379,6 @@ function extractLinkedInJob({ html, url }) {
         companyLogo,
     };
 }
-
 
 function extractJobsFromLinkedInHTML(html) {
     const $ = cheerio.load(html);
