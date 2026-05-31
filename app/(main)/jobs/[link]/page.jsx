@@ -1,18 +1,21 @@
 "use client"
 
-import { getJob } from '@/actions/jobs';
+import { getJob, markJobAsApplied } from '@/actions/jobs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import useFetch from '@/hooks/use-fetch';
-import { Bookmark, Building2, ExternalLink, MapPin } from 'lucide-react';
+import { Bookmark, Building2, ExternalLink, Loader2, MapPin } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner';
 import BackButton from '../_components/BackButton';
+import { useAuth } from '@clerk/nextjs';
 
 const page = () => {
     const { fn: getJobFn, data: jobData } = useFetch(getJob);
+    const { loading: markLoading, fn: markAppliedFn, data: markJobData } = useFetch(markJobAsApplied);
     const [loading, setLoading] = useState(true);
+    const [isApplied, setApplied] = useState(false);
 
     const params = useParams();
     useEffect(() => {
@@ -25,12 +28,31 @@ const page = () => {
                 toast.error("Failed to get job data");
             }
 
+
             setLoading(false);
         }
         if (params?.link) {
             fetchJob();
         }
     }, [])
+
+    useEffect(() => {
+        if (markJobData) {
+            setApplied(markJobData?.success);
+            return;
+        }
+        if (jobData) {
+            setApplied(jobData.isApplied);
+        }
+
+    }, [jobData, markJobData])
+
+    useEffect(() => {
+        if (markJobData) {
+            console.log(markJobData);
+            toast.success("Job marked");
+        }
+    }, [markJobData]);
 
     if (loading) {
         return (<>
@@ -70,8 +92,33 @@ const page = () => {
         );
     }
 
+    function linkify(text) {
+        return text.replace(
+            /(https?:\/\/[^\s<]+)/g,
+            '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline font-medium">$1</a>'
+        );
+    }
 
     console.log(jobData);
+
+    const handleMarkAsApplied = async () => {
+        try {
+            await markAppliedFn({
+                id: jobData.id,
+                source: jobData.source,
+                title: jobData.title,
+                company: jobData.company,
+                location: jobData.location,
+                description: jobData.description,
+                applyLink: jobData.applyLink,
+                companyLogo: jobData.companyLogo,
+                externalJobId: jobData.externalJobId
+            });
+        } catch (error) {
+            toast.error(error.message || "Failed to mark");
+        }
+    };
+
     return (
         <>
             <BackButton />
@@ -103,15 +150,16 @@ const page = () => {
                                 </div>
                             </div>
 
-                            <Button asChild>
-                                <a
-                                    href={jobData.applyLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
+                            <Button
+                                variant="outline"
+                                onClick={handleMarkAsApplied}
+                                disabled={markLoading || isApplied}
+                            >
+                                {markLoading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <>
                                     <Bookmark className="h-4 w-4" />
                                     Mark as Applied
-                                </a>
+                                </>}
+
                             </Button>
                             <Button asChild>
                                 <a
@@ -133,7 +181,7 @@ const page = () => {
                             <div
                                 className="prose prose-sm dark:prose-invert max-w-none"
                                 dangerouslySetInnerHTML={{
-                                    __html: jobData.description,
+                                    __html: linkify(jobData.description),
                                 }}
                             />
                         </div>

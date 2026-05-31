@@ -109,6 +109,7 @@ model AppliedJob {
 
   @@index([userId])
   @@index([externalJobId])
+  @@unique([userId, externalJobId])
 }
 
 model SimulationSession {
