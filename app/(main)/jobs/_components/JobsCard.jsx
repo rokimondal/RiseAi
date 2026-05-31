@@ -45,7 +45,7 @@ const JobsCard = ({ jobs = [] }) => {
                                 </div>
 
                                 {job.hiringStatus && (
-                                    <div className="mt-3 inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                                    <div className="mt-3 inline-flex rounded-full bg-green-100 dark:bg-green-900 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-200">
                                         {job.hiringStatus}
                                     </div>
                                 )}
