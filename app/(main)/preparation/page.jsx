@@ -30,13 +30,6 @@ const preparationTools = [
         status: "available"
     },
     {
-        title: "Company Hiring Simulation",
-        description: "Simulate complete hiring rounds based on real company patterns and difficulty levels.",
-        icon: Building2,
-        href: "/preparation/company-simulation",
-        status: "upcoming"
-    },
-    {
         title: "Assessment Center",
         description: "Practice company-style assessments with MCQs, multi-select, short answers, and situational questions.",
         icon: ClipboardCheck,
@@ -48,6 +41,13 @@ const preparationTools = [
         description: "Solve timed coding challenges tailored to company hiring rounds and specific engineering roles.",
         icon: Laptop,
         href: "/preparation/company-coding-round",
+        status: "available"
+    },
+    {
+        title: "Company Hiring Simulation",
+        description: "Simulate complete hiring rounds based on real company patterns and difficulty levels.",
+        icon: Building2,
+        href: "/preparation/company-simulation",
         status: "available"
     },
     

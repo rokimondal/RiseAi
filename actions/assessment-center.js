@@ -52,6 +52,7 @@ function calculateAssessmentCredits(questions, type = "GENERATION") {
         Math.ceil(total)
     );
 }
+
 async function callAI(prompt) {
     const result = await model.generateContent(prompt);
     const text = result.response.text();
@@ -1934,11 +1935,6 @@ export async function evaluateAssessmentCenter({ userAnswers, sessionToken, time
                 submittedAt:
                     new Date(),
 
-                creditsUsed: {
-                    increment:
-                        TotalCredits,
-                },
-
                 payload: {
                     assessmentMetadata: { ...session.payload.assessmentMetadata, timeTaken },
                     QuestionWithSolution
@@ -1957,6 +1953,753 @@ export async function evaluateAssessmentCenter({ userAnswers, sessionToken, time
         assessmentMetadata: { ...session.payload.assessmentMetadata, timeTaken, objectiveMarks },
         QuestionWithSolution: buildEvaluationPayload(QuestionWithSolution)
     };
+
+    console.log(AssessmentData);
+
+    // throw new Error("failed");
+
+    const prompt = `
+You are an Enterprise Assessment Evaluation Engine.
+
+CRITICAL:
+Return STRICTLY VALID JSON.
+
+NO markdown.
+NO explanations.
+NO comments.
+NO extra text.
+
+If JSON is invalid → regenerate internally.
+
+==================================================
+INPUT
+==================================================
+
+${JSON.stringify(AssessmentData, null, 2)}
+
+==================================================
+OBJECTIVE
+==================================================
+
+Evaluate ONLY subjective questions:
+
+- SHORT_ANSWER
+- LONG_ANSWER
+
+Objective questions are ALREADY evaluated by system.
+
+DO NOT recalculate:
+- objective scores
+- obtainedMarks
+- correctness
+
+Objective questions are provided ONLY for:
+
+- overall analysis
+- strengths analysis
+- weaknesses analysis
+- recommendation analysis
+- skill analysis
+
+==================================================
+SUBJECTIVE QUESTION EVALUATION RULE
+==================================================
+
+Evaluate ONLY:
+
+- SHORT_ANSWER
+- LONG_ANSWER
+
+Each subjective question contains:
+
+- marks
+- expectedAnswer
+- userAnswer
+
+==================================================
+SUBJECTIVE SCORING RULE
+==================================================
+
+Rules:
+
+1. obtainedMarks MUST NOT exceed marks
+
+2. Completely incorrect answer:
+   → negative score
+
+3. Partially correct answer:
+   → medium positive score
+
+4. Strong answer:
+   → high positive score
+
+5. NEVER always give full marks
+
+6. If userAnswer is empty:
+   → obtainedMarks MUST be negative
+   → result MUST be "WRONG"
+
+7. Evaluate:
+   - conceptual clarity
+   - correctness
+   - analytical depth
+   - completeness
+   - practical understanding
+
+==================================================
+SUBJECTIVE NEGATIVE MARKING RULE
+==================================================
+
+Subjective questions ALSO support negative marking.
+
+Each subjective question contains:
+
+- marks
+- negativeMarks
+
+Rules:
+
+1. CORRECT
+   → obtainedMarks should be high positive
+
+2. PARTIALLY_CORRECT
+   → obtainedMarks should be medium positive
+
+3. WRONG
+   → obtainedMarks MUST be negative
+
+4. For WRONG answers:
+   → use question.negativeMarks
+
+Example:
+
+{
+  "questionId": 12,
+  "marks": 10,
+  "negativeMarks": 2
+}
+
+Wrong evaluation:
+
+{
+  "questionId": 12,
+  "obtainedMarks": -2,
+  "result": "WRONG"
+}
+
+5. NEVER return 0 for completely wrong answer
+   if negativeMarks exists.
+
+6. obtainedMarks MUST NEVER exceed marks.
+
+7. result values MUST remain ONLY:
+
+- CORRECT
+- PARTIALLY_CORRECT
+- WRONG
+
+==================================================
+OBJECTIVE QUESTION RULE
+==================================================
+
+Objective questions already contain:
+
+- question
+- isCorrect
+
+DO NOT modify them.
+
+Objective obtained marks are already calculated separately inside:
+
+assessmentMetadata.objectiveMarks
+
+==================================================
+ASSESSMENT ANALYSIS ENGINE
+==================================================
+
+Analyze FULL assessment performance using:
+
+- objective question accuracy
+- subjective answer quality
+- topic consistency
+- analytical ability
+- conceptual understanding
+- problem solving ability
+
+==================================================
+SCORE ENGINE
+==================================================
+
+Generate ONLY assessment-related scores.
+
+DO NOT generate:
+- communicationScore
+- personalityScore
+- speakingScore
+
+because this is NOT an interview.
+
+==================================================
+REQUIRED SCORES
+==================================================
+
+Generate:
+
+1. overallScore
+2. technicalScore
+3. analyticalScore
+4. problemSolvingScore
+5. accuracyScore
+
+--------------------------------------------------
+technicalScore
+--------------------------------------------------
+
+Based on:
+- technical correctness
+- domain knowledge
+- conceptual understanding
+
+--------------------------------------------------
+analyticalScore
+--------------------------------------------------
+
+Based on:
+- reasoning
+- logical thinking
+- analytical depth
+- decision making
+
+--------------------------------------------------
+problemSolvingScore
+--------------------------------------------------
+
+Based on:
+- solution approach
+- debugging ability
+- scenario handling
+- practical thinking
+
+--------------------------------------------------
+accuracyScore
+--------------------------------------------------
+
+Based on:
+- correct objective answers
+- precision
+- consistency
+- negative marking impact
+
+==================================================
+OBJECTIVE MARKS RULE
+==================================================
+
+assessmentMetadata.objectiveMarks contains
+ONLY SINGLE_SELECT and MULTI_SELECT scores.
+
+Structure:
+
+{
+  obtainedMarks,
+  totalMarks
+}
+
+These values are already calculated by system.
+
+DO NOT recalculate them.
+DO NOT modify them.
+
+Use them ONLY for:
+
+- overall analysis
+- strengths analysis
+- weaknesses analysis
+- technical analysis
+- accuracy analysis
+
+==================================================
+OVERALL SCORE RULE
+==================================================
+
+overallScore MUST be calculated using:
+
+1. assessmentMetadata.objectiveMarks.obtainedMarks
+
+PLUS
+
+2. sum of subjectiveEvaluations.obtainedMarks
+
+--------------------------------------------------
+
+Total maximum marks:
+
+1. assessmentMetadata.objectiveMarks.totalMarks
+
+PLUS
+
+2. total subjective question marks
+
+--------------------------------------------------
+
+Formula:
+
+(
+objective obtained marks
++
+subjective obtained marks
+)
+/
+(
+objective total marks
++
+subjective total marks
+)
+× 100
+
+Return rounded integer.
+
+==================================================
+STRENGTH RULE
+==================================================
+
+Strengths MUST reflect:
+
+- strong concepts
+- technical strengths
+- analytical strengths
+- consistent performance
+- strong topics
+
+==================================================
+WEAKNESS RULE
+==================================================
+
+Weaknesses MUST reflect:
+
+- conceptual gaps
+- weak topics
+- poor analytical depth
+- incorrect patterns
+- incomplete understanding
+
+==================================================
+IMPROVEMENT TIP RULE
+==================================================
+
+Provide practical actionable improvements.
+
+Bad:
+"Practice more"
+
+Good:
+"Improve SQL joins and normalization concepts"
+
+==================================================
+HIRING RECOMMENDATION RULE
+==================================================
+
+Allowed values ONLY:
+
+- STRONG_HIRE
+- HIRE
+- BORDERLINE
+- Reject
+
+==================================================
+TIME ANALYSIS RULE
+==================================================
+
+Use:
+assessmentMetadata.timeTaken
+
+Analyze:
+- efficiency
+- completion speed
+- time management
+
+==================================================
+SUBJECTIVE EVALUATION RULE
+==================================================
+
+Return subjectiveEvaluations ONLY for:
+
+- SHORT_ANSWER
+- LONG_ANSWER
+
+DO NOT include:
+- strengths
+- weaknesses
+- feedback
+
+inside per-question evaluation.
+
+==================================================
+SUBJECTIVE RESULT RULE
+==================================================
+
+Each subjective evaluation MUST include:
+
+"result"
+
+Allowed values ONLY:
+
+- CORRECT
+- PARTIALLY_CORRECT
+- WRONG
+
+Rules:
+
+1. CORRECT
+   → answer is mostly accurate,
+   conceptually strong,
+   and obtainedMarks is high
+
+2. PARTIALLY_CORRECT
+   → answer contains partial understanding,
+   incomplete explanation,
+   or medium obtainedMarks
+
+3. WRONG
+   → answer is mostly incorrect,
+   irrelevant,
+   empty,
+   vague,
+   or conceptually incorrect
+
+   AND:
+
+   obtainedMarks MUST be NEGATIVE
+   using question.negativeMarks
+
+   
+==================================================
+SELF VALIDATION
+==================================================
+
+Before returning:
+
+✓ Valid JSON
+
+✓ overallScore exists
+✓ technicalScore exists
+✓ analyticalScore exists
+✓ problemSolvingScore exists
+✓ accuracyScore exists
+
+✓ strengths exists
+✓ weaknesses exists
+✓ improvementTips exists
+✓ hiringRecommendation exists
+
+✓ subjectiveEvaluations exists
+
+For every subjective evaluation:
+
+✓ questionId exists
+✓ obtainedMarks exists
+✓ result exists
+
+✓ obtainedMarks <= question.marks
+
+==================================================
+OUTPUT FORMAT
+==================================================
+
+{
+  "overallScore": number,
+
+  "technicalScore": number,
+
+  "analyticalScore": number,
+
+  "accuracyScore": number,
+
+  "hiringRecommendation":
+    "Strong Hire | Hire | Neutral | Reject",
+
+  "strengths": [
+    string
+  ],
+
+  "weaknesses": [
+    string
+  ],
+
+  "improvementTips": [
+    string
+  ],
+
+  "subjectiveEvaluations": [
+  {
+    "questionId": number,
+
+    "obtainedMarks": number,
+
+    "result":
+      "CORRECT" |
+      "PARTIALLY_CORRECT" |
+      "WRONG"
+  }
+]
+}
+`;
+
+
+    try {
+        // console.log("prompt: ", prompt);
+        const result = await model.generateContent(prompt);
+        const response = result.response;
+        let text = response.text();
+        const cleanedText = text.replace(/```(?:json)?\n?/g, "").replace(/```/g, "").trim();
+        let evaluation;
+
+        try {
+
+            const parsed = JSON.parse(cleanedText);
+
+            if (
+                parsed.overallScore === undefined
+            ) {
+                throw new Error(
+                    "Missing evaluation scores"
+                );
+            }
+
+            evaluation = parsed;
+
+        } catch (err) {
+            console.error("Invalid JSON from AI:", cleanedText);
+
+            throw new Error("AI returned invalid interview format");
+        }
+
+        console.log(
+            "evaluation",
+            evaluation
+        );
+
+        const metadata = AssessmentData.assessmentMetadata;
+
+        const FinalQuestions =
+            buildFinalResultQuestions({
+                QuestionWithSolution,
+                subjectiveEvaluations:
+                    evaluation.subjectiveEvaluations,
+            });
+
+        const FinalMetadata = {
+            overallScore:
+                evaluation.overallScore,
+
+            technicalScore:
+                evaluation.technicalScore,
+
+            analyticalScore:
+                evaluation.analyticalScore,
+
+            accuracyScore:
+                evaluation.accuracyScore,
+
+            hiringRecommendation:
+                evaluation.hiringRecommendation,
+        };
+
+        const FinalResultPayload = {
+            strengths:
+                evaluation.strengths || [],
+
+            weaknesses:
+                evaluation.weaknesses || [],
+
+            questions:
+                FinalQuestions,
+        };
+
+        const simulationResult =
+            await db.$transaction(
+                async (tx) => {
+
+                    const updatedUser =
+                        await tx.user.update({
+                            where: {
+                                id: user.id,
+                            },
+
+                            data: {
+                                credits: {
+                                    decrement: TotalCredits,
+                                },
+                            },
+                        });
+
+                    await tx.creditTransaction.create({
+                        data: {
+                            userId:
+                                user.id,
+
+
+                            amount:
+                                - (
+                                    session.creditsUsed + TotalCredits
+                                ),
+
+                            balanceAfter:
+                                updatedUser.credits,
+
+                            type: "USAGE",
+
+                            title:
+                                "Assessment Center",
+
+                            description: `${metadata.companyName} ${metadata.examOrRole} assessment evaluation`,
+                        },
+                    });
+
+                    await tx.simulationResult.create({
+                        data: {
+                            sessionId:
+                                session.id,
+
+                            userId:
+                                user.id,
+
+                            type:
+                                session.type,
+
+                            score:
+                                evaluation.overallScore,
+
+                            metadata: FinalMetadata,
+
+                            result: FinalResultPayload,
+
+                            improvementTip:
+                                evaluation.improvementTips?.slice(0, 3)?.join(", "),
+                        },
+                    });
+
+                    const updatedSession = await tx.simulationSession.update({
+                        where: {
+                            id: session.id,
+                        },
+
+                        data: {
+                            status:
+                                "SUBMITTED",
+
+                            submittedAt:
+                                new Date(),
+
+                            creditsUsed: {
+                                increment:
+                                    TotalCredits,
+                            },
+
+                            payload: {
+                                assessmentMetadata: {
+                                    ...session.payload.assessmentMetadata,
+
+                                    timeTaken,
+
+                                    objectiveMarks:
+                                        metadata.objectiveMarks,
+                                },
+                            },
+                        },
+
+                        include: {
+                            result: true,
+                        },
+                    });
+
+                    return {
+                        session: updatedSession,
+                        updatedCredits:
+                            updatedUser.credits,
+                    };
+                },
+                {
+                    timeout: 15000,
+                }
+            );
+
+        const finalResponse = {
+            success: true,
+
+            data: {
+                session:
+                    simulationResult.session,
+
+                updatedCredits:
+                    simulationResult.updatedCredits,
+
+                userName:
+                    user.name,
+            }
+        };
+
+        console.log(JSON.stringify(finalResponse));
+
+        return finalResponse;
+    } catch (error) {
+        console.error("Error evaluating coding assessment:", error);
+        throw new Error("Failed to evaluate coding assessment");
+    }
+}
+
+export async function evaluatePendingAssessmentCenter({ sessionToken }) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+        where: {
+            clerkUserId: userId,
+        },
+    })
+
+    if (!user) throw new Error("User not exist");
+
+    const session =
+        await db.simulationSession.findUnique({
+            where: {
+                sessionToken,
+            },
+        });
+
+    if (!session) {
+        throw new Error("Session not found");
+    }
+
+    if (session.userId !== user.id) {
+        throw new Error("Unauthorized");
+    }
+
+    if (session.status === "SUBMITTED") {
+        throw new Error(
+            "Assessment already submitted"
+        );
+    }
+
+
+    const QuestionWithSolution = session.payload.QuestionWithSolution;
+
+    const TotalCredits = calculateAssessmentCredits(QuestionWithSolution, "EVALUATION") + EVALUATION_CALL_CREDITS;
+
+    if (user.credits < TotalCredits) {
+        throw new Error(
+            `Insufficient credits. Required ${TotalCredits}`
+        );
+    }
+
+
+    const objectiveMarks = calculateObjectiveMarks(QuestionWithSolution);
+
+    let AssessmentData = {
+        assessmentMetadata: { ...session.payload.assessmentMetadata, objectiveMarks },
+        QuestionWithSolution: buildEvaluationPayload(QuestionWithSolution)
+    };
+
+
 
     console.log(AssessmentData);
 

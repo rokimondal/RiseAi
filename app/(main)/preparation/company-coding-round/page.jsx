@@ -1,6 +1,6 @@
 import React from 'react'
 import { getUserOnboardingStatus } from '@/actions/user'
-import BackButton from '../_components/BackButton'
+import BackButton from '../../../../components/BackButton'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import CodingPageSteps from './_components/CodingPageSteps';
@@ -12,10 +12,10 @@ const CompanyCodingPage = async () => {
         redirect("/onboarding");
     }
 
-    const data ={
+    const data = {
         type: "normal", // normal | hiringSimulation
         resumeData: null,
-        formData:null,
+        formData: null,
     }
 
     return (
@@ -31,7 +31,7 @@ const CompanyCodingPage = async () => {
             </div>
 
             {/* <Quiz /> */}
-            <CodingPageSteps data={data}/>
+            <CodingPageSteps data={data} />
         </div>
     )
 }

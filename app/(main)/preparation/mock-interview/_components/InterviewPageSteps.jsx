@@ -29,6 +29,9 @@ const InterviewPageSteps = ({ data }) => {
     const { loading: generating, fn: generateInterviewQuestionFn, data: generatedInterviewQuestion } = useFetch(generateInterviewQuestion);
     const { loading: evaluating, fn: evaluateFn, data: result } = useFetch(EvaluateInterview);
 
+    const setAfterResumePage = () => {
+        setStep(4);
+    }
 
     // useEffect(() => {
     //     console.log("formdata: ", formData);
@@ -202,7 +205,7 @@ const InterviewPageSteps = ({ data }) => {
 
         case 3:
             return (
-                <ResumeSelector setResumeContent={setResumeContent} setStep={setStep} />
+                <ResumeSelector setResumeContent={setResumeContent} setAfterResumePage={setAfterResumePage} />
             )
 
         case 4:
@@ -218,7 +221,7 @@ const InterviewPageSteps = ({ data }) => {
 
         case 6:
             return (
-                <InterviewResult result={result} evaluating={evaluating}/>
+                <InterviewResult result={result} evaluating={evaluating} />
             )
 
         default:

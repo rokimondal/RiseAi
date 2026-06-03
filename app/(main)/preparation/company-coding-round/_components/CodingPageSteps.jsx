@@ -159,6 +159,7 @@ const CodingPageSteps = ({ data }) => {
             ]
         }
     }
+    
     const dummyResult = {
         "success": true,
         "data": {

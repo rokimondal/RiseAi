@@ -87,7 +87,7 @@ export const interviewSchema = z.object({
 
 
 const programmingLanguageField = z.enum(
-    [ "Java", "CPP", "Python", "JavaScript", "C", "typescript", "go", "rust", "ruby", "php" ],
+    ["Java", "CPP", "Python", "JavaScript", "C", "typescript", "go", "rust", "ruby", "php"],
     {
         required_error: "Programming Language is required",
     }
@@ -101,7 +101,7 @@ const roleBasedSchema = z.object({
     role: z.string().trim().min(1, "Role is required"),
 
     experienceLevel: z.enum(
-        ["Intern", "Fresher", "1–3 Years", "3–5 Years", "Senior"],
+        ["Intern", "Fresher", "1–3 Years", "3–5 Years", "10+ Years"],
         {
             required_error: "Experience Level is required",
         }
@@ -131,7 +131,6 @@ export const codingTestSchema = z.discriminatedUnion(
     "assessmentMode",
     [roleBasedSchema, examSchema]
 );
-
 
 const assessmentRoleBasedSchema = z.object({
     assessmentMode: z.literal("ROLE_BASED"),
@@ -200,3 +199,11 @@ export const assessmentCenterSchema = z.discriminatedUnion(
         assessmentExamBasedSchema
     ]
 );
+
+export const companyHiringSimulationSchema = z.object({
+    companyName: z.string().trim().min(1, "Company name is required"),
+    role: z.string().trim().min(1, "Role is required"),
+    experienceLevel: z.enum(["Intern", "Fresher", "0-1 Years", "1-3 Years", "3-5 Years", "5-8 Years", "8-10 Years", "10+ Years",]),
+    hiringType: z.enum(["On-Campus", "Off-Campus", "Lateral",]),
+    jobDescription: z.string().trim().optional(),
+});

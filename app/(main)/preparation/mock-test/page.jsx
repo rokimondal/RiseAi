@@ -1,7 +1,7 @@
 import React from 'react'
 import { getUserOnboardingStatus } from '@/actions/user'
 import Quiz from './_components/Quiz'
-import BackButton from '../_components/BackButton'
+import BackButton from '../../../../components/BackButton'
 
 const MockInterviewPage = async () => {
   const { isOnboarded } = await getUserOnboardingStatus();
