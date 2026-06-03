@@ -107,28 +107,29 @@ model AppliedJob {
   updatedAt     DateTime          @updatedAt
   user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, externalJobId])
   @@index([userId])
   @@index([externalJobId])
-  @@unique([userId, externalJobId])
 }
 
 model SimulationSession {
-  id              String            @id @default(cuid())
-  sessionToken    String            @unique @default(cuid())
-  userId          String
-  type            SimulationType
-  status          SessionStatus     @default(STARTED)
-  payload         Json?
-  startedAt       DateTime?
-  submittedAt     DateTime?
-  expiresAt       DateTime?
-  durationSeconds Int?
-  autoSubmitted   Boolean           @default(false)
-  creditsUsed     Int               @default(0)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  result          SimulationResult?
+  id               String            @id @default(cuid())
+  sessionToken     String            @unique @default(cuid())
+  userId           String
+  type             SimulationType
+  status           SessionStatus     @default(STARTED)
+  payload          Json?
+  startedAt        DateTime?
+  submittedAt      DateTime?
+  expiresAt        DateTime?
+  durationSeconds  Int?
+  autoSubmitted    Boolean           @default(false)
+  creditsUsed      Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  result           SimulationResult?
+  linkedSessionIds String[]          @default([])
 
   @@index([userId])
   @@index([status])

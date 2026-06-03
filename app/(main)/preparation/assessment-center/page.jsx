@@ -1,6 +1,6 @@
 import { getUserOnboardingStatus } from '@/actions/user';
 import React from 'react'
-import BackButton from '../_components/BackButton';
+import BackButton from '../../../../components/BackButton';
 import AssessmentSteps from './_components/AssessmentSteps';
 
 const page = async () => {

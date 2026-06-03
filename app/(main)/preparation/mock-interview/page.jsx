@@ -1,6 +1,6 @@
 import React from 'react'
 import { getUserOnboardingStatus } from '@/actions/user'
-import BackButton from '../_components/BackButton'
+import BackButton from '../../../../components/BackButton'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import InterviewPageSteps from './_components/InterviewPageSteps';
@@ -29,7 +29,7 @@ const MockInterviewPage = async () => {
                     </p>
                 </div>
             </div>
-            
+
             <InterviewPageSteps data={data} />
         </div>
     )

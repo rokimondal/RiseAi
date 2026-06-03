@@ -11,7 +11,7 @@ import { toast } from 'sonner'
 import ResumeDropzone from './ResumeDropzone'
 import { extractResumeText, htmlToText } from '@/app/lib/helper'
 
-const ResumeSelector = ({ setResumeContent, setStep }) => {
+const ResumeSelector = ({ setResumeContent, setAfterResumePage }) => {
 
     const { loading: fetchingResume, fn: fetchResumeFn, data: fetchResumeData } = useFetch(getResume);
     const [uploadedFile, setUploadedFile] = useState(null);
@@ -28,7 +28,7 @@ const ResumeSelector = ({ setResumeContent, setStep }) => {
                 // console.log(uploadContent);
                 toast.success("Resume Uploaded Successfully");
                 setResumeContent(uploadContent);
-                setStep(4);
+                setAfterResumePage()
                 return;
             }
             if (fetchResumeData) {
@@ -45,7 +45,7 @@ const ResumeSelector = ({ setResumeContent, setStep }) => {
                 // console.log(filteredContent);
                 toast.success("Resume fetched Successfully");
                 setResumeContent(filteredContent);
-                setStep(4);
+                setAfterResumePage();
             }
         }
         processResume();

@@ -8,8 +8,8 @@ import { Bookmark, Building2, ExternalLink, Loader2, MapPin } from 'lucide-react
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner';
-import BackButton from '../_components/BackButton';
 import { useAuth } from '@clerk/nextjs';
+import BackButton from '@/components/BackButton';
 
 const page = () => {
     const { fn: getJobFn, data: jobData } = useFetch(getJob);

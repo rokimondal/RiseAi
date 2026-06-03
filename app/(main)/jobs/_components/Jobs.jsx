@@ -2,7 +2,6 @@
 
 import { getFilteredJobs, getJobs } from '@/actions/jobs';
 import React, { useEffect, useState } from 'react'
-import BackButton from './BackButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -156,7 +155,6 @@ const jobs = () => {
     if (!finalJobs && !loading) {
         return (
             <>
-                <BackButton />
                 <div className="container mx-auto py-8">
                     No jobs found
                 </div>
