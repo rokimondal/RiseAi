@@ -1,13 +1,10 @@
 "use server"
 
+import { callAI } from "@/Ai/callAI";
+import { getCoverLetterGenerationPrompt } from "@/Ai/prompts/coverLetter";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash"
-})
 
 export async function generateCoverLetter(data) {
     const { userId } = await auth();
@@ -24,42 +21,12 @@ export async function generateCoverLetter(data) {
 
     if (!user) throw new Error("User not exist");
 
-
-    const prompt = `
-You are an expert career assistant specializing in professional writing.
-
-Generate a highly personalized and compelling **cover letter** for a **${data.jobTitle}** position at **${data.companyName}**.
-
-### Candidate Information:
-- Industry: ${user.industry || "Not specified"}
-- Years of Experience: ${user.experience || "Not specified"}
-- Key Skills: ${user.skills?.join(", ") || "Not specified"}
-- Professional Background: ${user.bio || "Not specified"}
-
-### Job Description:
-${data.jobDescription || "No description provided."}
-
-### Instructions:
-1. Write in a **professional yet enthusiastic tone** that reflects genuine interest in the role.
-2. Highlight the candidate’s **most relevant skills, achievements, and experience** that align with the company’s needs.
-3. Mention the company name **naturally throughout** to make the letter feel personalized.
-4. Keep it **concise and impactful** (between **250–400 words**).
-5. Use **proper business letter formatting**, starting with the candidate’s details, date, company info, greeting, body, and closing.
-6. Avoid generic phrases—make it sound authentic and tailored to the given information.
-7. End with a **strong, confident closing paragraph** inviting further discussion.
-
-### Output Format:
-Provide the final cover letter **in plain text format**, without markdown symbols or code fences.
-`;
-
-
-
     try {
-        const result = await model.generateContent(prompt)
-        const content = result.response.text().trim();
+        const content = await callAI(getCoverLetterGenerationPrompt(user, data));
+        console.log(content);
         const coverLetter = await db.coverLetter.create({
             data: {
-                content,
+                content: content.coverLetter,
                 jobDescription: data.jobDescription,
                 companyName: data.companyName,
                 jobTitle: data.jobTitle,
@@ -69,6 +36,7 @@ Provide the final cover letter **in plain text format**, without markdown symbol
         })
 
         console.log("Schema", coverLetter);
+        console.log(coverLetter);
         return coverLetter;
     } catch (error) {
         console.log(error);

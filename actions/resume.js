@@ -1,13 +1,9 @@
 "use server"
 
+import { callAI } from "@/Ai/callAI";
+import { getGenerateResumePrompt, getImproveResumePrompt } from "@/Ai/prompts/resume";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash"
-})
 
 export async function saveResume(content) {
     const { userId } = await auth();
@@ -116,33 +112,16 @@ export async function improveRESUME({ editorContent }) {
     maskedContent = maskAll(maskedContent, linkedins, PLACEHOLDERS.linkedin);
     maskedContent = maskAll(maskedContent, twitters, PLACEHOLDERS.twitter);
 
-    const prompt = `You are an AI that improves resume HTML content compatible with Tiptap editor.
-Use inline CSS only; do not use external CSS files or classes.
-Do not include or expose any real email, mobile, LinkedIn, or Twitter; use placeholders instead.
-
-Here is the resume content to improve:
-${maskedContent}
-
-Requirements:
-1. Fix formatting, styling, readability, and layout issues.
-2. Keep all HTML compatible with Tiptap editor.
-3. Preserve all sections.
-4. Return only valid JSON with a single property "html" containing the improved HTML code.
-`;
-
     try {
-        console.log("prompt: ", prompt);
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        let text = response.text();
-        const cleanedText = text.replace(/```(?:json|html)?\n?/g, "").replace(/```/g, "").trim();
+        const response = await callAI(
+            getImproveResumePrompt(maskedContent)
+        );
+        console.log(response);
         let improvedContent;
         try {
+            const parsed = response;
 
-            // console.log("prompt", prompt);
-            const parsed = JSON.parse(cleanedText);
-            improvedContent = parsed.html || "";
-
+            improvedContent = parsed.html || parsed.content || "";
         } catch (err) {
             console.warn("Failed to parse AI response as JSON, fallback to raw content.");
             improvedContent = cleanedText;
@@ -210,35 +189,16 @@ export async function generateRESUME({ designInstruction, userData }) {
     if (userData.contactInfo.twitter) maskedContactInfo.twitter = PLACEHOLDERS.twitter;
     const maskedUserData = { ...userData, contactInfo: maskedContactInfo };
 
-    const prompt = `You are an AI that generates resume content as HTML compatible with Tiptap editor. 
-Use **inline CSS only** for styling; do not use external CSS files or classes. 
-Make the resume visually appealing, colorful, and professional according to the design instruction: ${designInstruction}.
-
-Input data:
-${JSON.stringify(maskedUserData, null, 2)}
-
-Requirements:
-1. Generate valid **HTML** that Tiptap editor can render.
-2. Use **inline CSS** for all styling (fonts, colors, spacing, borders, etc.).
-3. Include all sections: Contact Info, Summary, Skills, Education, Experience, Projects (if available).
-4. Make the layout readable and professional, with subtle colors and proper spacing.
-5. Include headings for each section.
-6. For dates, show them as "Start – End" (if end date is empty, show "Start – Present").
-7. Ensure no scripts or external references; only HTML + inline CSS.
-
-Output:
-Return only the HTML code that can be inserted into Tiptap editor.
-
-  `;
-
     try {
-        const result = await model.generateContent(prompt)
-        const response = result.response;
-        let generatedContent = response.text();
-        generatedContent = generatedContent
-            .replace(/```(?:json|html)?\n?/g, "")
-            .replace(/```/g, "")
-            .trim();
+        let generatedContent = await callAI(
+            getGenerateResumePrompt(
+                designInstruction,
+                maskedUserData
+            )
+        );
+
+        generatedContent = generatedContent?.trim().html || "";
+
         const replaceIfMasked = (placeholder, value) => {
             if (generatedContent.includes(placeholder)) {
                 generatedContent = generatedContent.split(placeholder).join(value);

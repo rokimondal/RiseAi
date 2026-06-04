@@ -60,15 +60,15 @@ const SimulationForm = ({ setFormData, setStep }) => {
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Role</Label>
+                        <Label>Job Title / Role</Label>
                         <Input
                             placeholder="Software Engineer"
-                            {...register("role")}
+                            {...register("jobTitle")}
                         />
 
-                        {errors.role && (
+                        {errors.jobTitle && (
                             <p className="text-sm text-red-500">
-                                {errors.role.message}
+                                {errors.jobTitle.message}
                             </p>
                         )}
                     </div>
@@ -174,7 +174,7 @@ const SimulationForm = ({ setFormData, setStep }) => {
                         <Button
                             type="submit"
                         >
-                            Plan Hiring Process
+                            Next
                         </Button>
                     </div>
                 </form>
