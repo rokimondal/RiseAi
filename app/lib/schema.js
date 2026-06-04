@@ -202,7 +202,7 @@ export const assessmentCenterSchema = z.discriminatedUnion(
 
 export const companyHiringSimulationSchema = z.object({
     companyName: z.string().trim().min(1, "Company name is required"),
-    role: z.string().trim().min(1, "Role is required"),
+    jobTitle: z.string().trim().min(1, "jobTitle is required"),
     experienceLevel: z.enum(["Intern", "Fresher", "0-1 Years", "1-3 Years", "3-5 Years", "5-8 Years", "8-10 Years", "10+ Years",]),
     hiringType: z.enum(["On-Campus", "Off-Campus", "Lateral",]),
     jobDescription: z.string().trim().optional(),

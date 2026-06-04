@@ -125,52 +125,61 @@ const page = () => {
             <div className="container mx-auto max-w-5xl py-8">
                 <Card>
                     <CardContent className="p-6">
-                        <div className="flex items-start gap-4">
-                            <img
-                                src={jobData.companyLogo}
-                                alt={jobData.company}
-                                className="h-16 w-16 rounded-lg border"
-                            />
+                        <div className="flex flex-col gap-6 md:flex-row md:items-start">
+                            <div className="flex items-start gap-4 flex-1">
+                                <img
+                                    src={jobData.companyLogo}
+                                    alt={jobData.company}
+                                    className="h-14 w-14 md:h-16 md:w-16 rounded-lg border shrink-0"
+                                />
 
-                            <div className="flex-1">
-                                <h1 className="text-3xl font-bold">
-                                    {jobData.title}
-                                </h1>
+                                <div className="min-w-0">
+                                    <h1 className="text-xl md:text-3xl font-bold break-words">
+                                        {jobData.title}
+                                    </h1>
 
-                                <div className="mt-2 flex flex-wrap gap-4 text-muted-foreground">
-                                    <div className="flex items-center gap-2">
-                                        <Building2 className="h-4 w-4" />
-                                        {jobData.company}
-                                    </div>
+                                    <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-4 text-muted-foreground">
+                                        <div className="flex items-center gap-2">
+                                            <Building2 className="h-4 w-4 shrink-0" />
+                                            <span>{jobData.company}</span>
+                                        </div>
 
-                                    <div className="flex items-center gap-2">
-                                        <MapPin className="h-4 w-4" />
-                                        {jobData.location}
+                                        <div className="flex items-center gap-2">
+                                            <MapPin className="h-4 w-4 shrink-0" />
+                                            <span>{jobData.location}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <Button
-                                variant="outline"
-                                onClick={handleMarkAsApplied}
-                                disabled={markLoading || isApplied}
-                            >
-                                {markLoading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <>
-                                    <Bookmark className="h-4 w-4" />
-                                    Mark as Applied
-                                </>}
-
-                            </Button>
-                            <Button asChild>
-                                <a
-                                    href={jobData.applyLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                            <div className="flex flex-col lg:flex-row sm:flex-row gap-3 md:flex-col ">
+                                <Button
+                                    variant="outline"
+                                    onClick={handleMarkAsApplied}
+                                    disabled={markLoading || isApplied}
+                                    className="w-full sm:w-auto"
                                 >
-                                    Apply Now
-                                    <ExternalLink className="h-4 w-4 ml-2" />
-                                </a>
-                            </Button>
+                                    {markLoading ? (
+                                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <>
+                                            <Bookmark className="h-4 w-4" />
+                                            Mark as Applied
+                                        </>
+                                    )}
+                                </Button>
+
+                                <Button asChild className="w-full sm:w-auto">
+                                    <a
+                                        href={jobData.applyLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Apply Now
+                                        <ExternalLink className="h-4 w-4 ml-2" />
+                                    </a>
+                                </Button>
+                            </div>
                         </div>
 
                         <div className="mt-8">

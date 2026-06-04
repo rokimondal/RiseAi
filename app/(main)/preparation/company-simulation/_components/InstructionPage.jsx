@@ -89,7 +89,7 @@ const Instructions = ({
 
             <CardFooter>
                 <Button
-                    onClick={handleStartSimulation}
+                    onClick={() => { handleStartSimulation() }}
                     className="w-full"
                     disabled={startingSimulation}
                 >

@@ -24,7 +24,7 @@ const CoverLetterGenerator = () => {
     useEffect(() => {
         if (generatedLetter) {
             toast.success("Cover letter generated successfully!");
-            router.push(`/ai-cover-letter/${generatedLetter.id}`);
+            router.push(`/growth-tools/ai-cover-letter/${generatedLetter.id}`);
             reset();
         }
     }, [generatedLetter])

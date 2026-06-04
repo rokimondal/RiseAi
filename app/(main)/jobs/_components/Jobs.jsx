@@ -166,10 +166,10 @@ const jobs = () => {
         <div className="space-y-6">
             {/* Header */}
             <Card>
-                <CardContent className="p-4 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3">
+                <CardContent className="p-3 sm:p-4 space-y-3 sm:space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2 sm:gap-3">
                         <Input
-                            className="h-11 focus:outline-none"
+                            className="h-10 sm:h-11 focus:outline-none"
                             placeholder="Keywords"
                             value={filters.keywords}
                             onChange={(e) => {
@@ -190,7 +190,7 @@ const jobs = () => {
                         />
 
                         <Input
-                            className="h-11 focus:outline-none"
+                            className="h-10 sm:h-11 focus:outline-none"
                             placeholder="Location"
                             value={filters.location}
                             onChange={(e) =>
@@ -202,7 +202,7 @@ const jobs = () => {
                         />
 
                         <Button
-                            className="h-11 md:w-auto w-full px-8"
+                            className="h-10 sm:h-11 w-full md:w-auto px-4 sm:px-8"
                             onClick={handleSearch}
                             disabled={filtering}
                         >
@@ -213,7 +213,7 @@ const jobs = () => {
                         </Button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
                         {FILTERS.map((filter) => (
                             <Select
                                 key={filter.key}
@@ -225,7 +225,7 @@ const jobs = () => {
                                     }))
                                 }
                             >
-                                <SelectTrigger className="h-11 w-full">
+                                <SelectTrigger className="h-10 sm:h-11 w-full">
                                     <SelectValue placeholder={filter.placeholder} />
                                 </SelectTrigger>
 
