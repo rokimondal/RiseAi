@@ -3,16 +3,17 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
-const InstructionPage = ({ setStep, data }) => {
+const InstructionPage = ({ setStep, type, handleStartAssesment, generatingAssesment }) => {
     const [accepted, setAccepted] = useState(false);
 
     const handleNextStep = () => {
-        if (data.type == "normal") {
+        if (type == "normal") {
             setStep(2);
         } else {
-            setStep(3);
+            handleStartAssesment?.();
         }
     }
     return (
@@ -63,9 +64,12 @@ const InstructionPage = ({ setStep, data }) => {
                 <Button
                     onClick={() => handleNextStep()}
                     className="w-full"
-                    disabled={!accepted}
+                    disabled={!accepted || generatingAssesment}
                 >
-                    Continue
+                    {generatingAssesment ? <>
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                        Starting...
+                    </> : (type == "normal" ? "Continue" : "Start Assessment")}
                 </Button>
             </CardFooter>
         </Card>

@@ -23,6 +23,8 @@ const InterviewResult = ({
   evaluating,
 }) => {
 
+  
+
   if (evaluating) {
     return (
       <BarLoader

@@ -20,6 +20,12 @@ const AssessmentResult = ({ result }) => {
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
+    if (!result.success) {
+        <Card className="border-none shadow-none" >
+            <p>{result.data.message}</p>
+        </Card>
+    }
+
     const data = result?.data || result;
     const session = data?.session;
     const metadata = session?.payload?.assessmentMetadata;
@@ -462,43 +468,43 @@ const AssessmentResult = ({ result }) => {
                                     currentQuestion.questionType ===
                                     "LONG_ANSWER"
                                 ) &&
-                        
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                                            <AnswerBox
-                                                title="Your Answer"
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                                                value={
-                                                    Array.isArray(
-                                                        currentQuestion.userAnswer
+                                        <AnswerBox
+                                            title="Your Answer"
+
+                                            value={
+                                                Array.isArray(
+                                                    currentQuestion.userAnswer
+                                                )
+                                                    ? currentQuestion.userAnswer.join(
+                                                        ", "
                                                     )
-                                                        ? currentQuestion.userAnswer.join(
-                                                            ", "
-                                                        )
-                                                        : currentQuestion.userAnswer ||
-                                                        "Not Attempted"
-                                                }
+                                                    : currentQuestion.userAnswer ||
+                                                    "Not Attempted"
+                                            }
 
-                                                result={currentQuestion.result}
-                                            />
+                                            result={currentQuestion.result}
+                                        />
 
-                                            <AnswerBox
-                                                title="Expected / Correct Answer"
+                                        <AnswerBox
+                                            title="Expected / Correct Answer"
 
-                                                value={
-                                                    Array.isArray(
-                                                        correctAnswers
+                                            value={
+                                                Array.isArray(
+                                                    correctAnswers
+                                                )
+                                                    ? correctAnswers.join(
+                                                        ", "
                                                     )
-                                                        ? correctAnswers.join(
-                                                            ", "
-                                                        )
-                                                        : correctAnswers
-                                                }
+                                                    : correctAnswers
+                                            }
 
-                                                result={"CORRECT"}
-                                            />
-                                        </div>
+                                            result={"CORRECT"}
+                                        />
+                                    </div>
                                 }
                             </CardContent>
                         </Card>

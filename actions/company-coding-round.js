@@ -2,20 +2,12 @@
 
 import { callAI } from "@/Ai/callAI";
 import { getEvaluationCodingAssessmentPrompt, getGenerateExamBasedCodingAssessmentPrompt, getGenerateRoleBasedCodingAssessmentPrompt } from "@/Ai/prompts/companyCoding";
+import { ASSESSMENT_EVALUATION_CREDITS, ASSESSMENT_GENERATION_CREDITS } from "@/util/costs";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import crypto from "crypto";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash"
-})
-
-const ASSESSMENT_GENERATION_CREDITS = 20;
-const ASSESSMENT_EVALUATION_CREDITS = 10;
-
-function sanitizeAssessmentData(data) {
+export async function sanitizeAssessmentData(data) {
     return JSON.parse(JSON.stringify(data));
 }
 
@@ -91,7 +83,7 @@ export async function generateCodingAssessment(data) {
             }
 
         } catch (err) {
-            console.error("Invalid JSON from AI:", cleanedText);
+            console.error("Invalid JSON from AI:", result);
             throw new Error("AI returned invalid assessment format");
         }
 
@@ -221,7 +213,7 @@ export async function runCode({ code, input, language, sessionToken, questionId 
     }
 }
 
-export async function EvaluateCodingAssessment({ codes, sessionToken, timeTaken }) {
+export async function evaluateCodingAssessment({ codes, sessionToken, timeTaken }) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
@@ -295,268 +287,6 @@ export async function EvaluateCodingAssessment({ codes, sessionToken, timeTaken 
         assessmentMetadata: { ...session.payload.assessmentMetadata, timeTaken },
         QuestionWithSolution
     };
-
-    const prompt = `
-You are an elite senior software engineer and coding interviewer evaluating a REAL coding assessment submission.
-
-You MUST evaluate the candidate ONLY based on:
-- The coding questions
-- The submitted solutions
-- Runtime behavior
-- Test case results
-- Code quality
-- Algorithmic quality
-- Problem-solving demonstrated in the code
-
-━━━━━━━━━━━━━━━━━━
-FULL ASSESSMENT PAYLOAD
-━━━━━━━━━━━━━━━━━━
-
-${JSON.stringify(AssessmentData, null, 2)}
-
-━━━━━━━━━━━━━━━━━━
-EVALUATION OBJECTIVE
-━━━━━━━━━━━━━━━━━━
-
-Evaluate the candidate realistically like a real FAANG/company hiring panel.
-
-Assessment may contain:
-- Multiple coding questions
-- Multiple languages
-- Passed/failed test cases
-- Compilation errors
-- Partial solutions
-
-Your evaluation MUST reflect:
-- Actual correctness
-- Algorithm quality
-- Time complexity awareness
-- Edge case handling
-- Clean coding practices
-- Problem-solving ability
-
-━━━━━━━━━━━━━━━━━━
-STRICT EVALUATION RULES
-━━━━━━━━━━━━━━━━━━
-
-1. Evaluate ONLY what is ACTUALLY present.
-
-2. NEVER assume:
-- hidden knowledge
-- unsubmitted logic
-- intended solutions
-- unstated optimizations
-
-3. Penalize for compilation/runtime/test failures ONLY IF the issue appears to originate from the candidate solution itself.
-
-IMPORTANT:
-Do NOT heavily penalize the candidate if failures may be caused by:
-- system wrapper issues
-- input parsing bugs
-- malformed wrapper logic
-- incorrect system-generated templates
-- execution environment problems
-- inconsistent testcase formatting
-- wrapper compilation failures unrelated to user logic
-
-If the submitted solution logic appears correct but execution failed due to probable wrapper/system issues:
-- mention uncertainty
-- reduce penalty severity
-- avoid harsh negative feedback
-- avoid assuming lack of technical ability
-
-Differentiate carefully between:
-- candidate logic errors
-- platform/wrapper/execution errors
-- failed test cases
-- brute force where optimization expected
-- incomplete implementations
-- empty methods
-- syntax issues
-- poor edge-case handling
-- hardcoded outputs
-- copied boilerplate without logic
-
-4. Reward:
-- passing all test cases
-- optimal algorithms
-- good naming
-- readable code
-- clean logic
-- edge-case handling
-- efficient data structures
-- concise implementations
-
-5. IMPORTANT REALISM RULES
-
-If:
-- many test cases fail
-- compilation errors exist
-- solutions are incomplete
-- only easy questions solved
-- brute force used for hard questions
-
-Then:
-- overall score should usually stay below 70
-- recommendation should NOT be "Strong Hire"
-
-6. Strong scores REQUIRE:
-- high pass rate
-- efficient solutions
-- clean implementations
-- consistency across questions
-
-7. If candidate solved only partial assessment:
-- clearly mention it
-- reduce technical/problem-solving scores
-
-8. If code quality is poor:
-- lower communication/professionalism indicators
-
-9. DO NOT hallucinate:
-- optimizations not present
-- edge-case handling not implemented
-- advanced knowledge not demonstrated
-
-10. If the candidate solution appears algorithmically correct but execution failed,
-carefully inspect whether the issue may originate from:
-- wrapper code
-- testcase parser
-- execution engine
-- generated templates
-
-In such situations:
-- reduce penalty severity
-- mention uncertainty
-- avoid assuming low technical skill
-- set possibleSystemIssue = true when appropriate
-
-━━━━━━━━━━━━━━━━━━
-QUESTION-WISE ANALYSIS RULES
-━━━━━━━━━━━━━━━━━━
-
-For EACH question evaluate:
-
-- correctness
-- whether failures originated from candidate logic or probable wrapper/system issues
-- passed test cases
-- failed test cases
-- algorithm quality
-- edge-case handling
-- code readability
-- efficiency
-
-━━━━━━━━━━━━━━━━━━
-SCORING SCALE
-━━━━━━━━━━━━━━━━━━
-
-0-30   = Very Poor
-31-50  = Weak
-51-70  = Average
-71-85  = Strong
-86-100 = Exceptional
-
-Most realistic candidates should fall between 45-75.
-
-━━━━━━━━━━━━━━━━━━
-RETURN STRICTLY VALID JSON
-━━━━━━━━━━━━━━━━━━
-
-{
-  "overallScore": 0,
-
-  "technicalScore": 0,
-
-  "problemSolvingScore": 0,
-
-  "codeQualityScore": 0,
-
-  "algorithmScore": 0,
-
-  "debuggingScore": 0,
-
-  "questionAnalysis": [
-    {
-      "questionId": 0,
-
-      "title": "string",
-
-      "difficulty": "Easy | Medium | Hard",
-
-      "passedTestCases": 0,
-
-      "totalTestCases": 0,
-
-      "score": 0,
-
-      "status":
-        "Solved | Partially Solved | Failed | Compilation Error",
-
-      "strengths": [
-        "string"
-      ],
-
-      "weaknesses": [
-        "string"
-      ],
-
-      "feedback": "string"
-    }
-  ],
-
-  "overallStrengths": [
-    "string"
-  ],
-
-  "overallWeaknesses": [
-    "string"
-  ],
-
-  "improvementTips": [
-    "string"
-  ],
-
-  "finalFeedback": "string",
-
-  "hiringRecommendation":
-    "Strong Hire | Hire | Neutral | Reject"
-}
-
-━━━━━━━━━━━━━━━━━━
-STRICT OUTPUT RULES
-━━━━━━━━━━━━━━━━━━
-
-- Return ONLY raw JSON
-- No markdown
-- No code blocks
-- No explanations
-- No extra text
-- All scores must be integers
-- All scores must be between 0-100
-- questionAnalysis MUST include every question
-- Feedback must be realistic and evidence-based
-- Do NOT invent passed test cases
-- Do NOT invent optimizations
-- Do NOT invent hidden logic
-
-━━━━━━━━━━━━━━━━━━
-SELF VALIDATION
-━━━━━━━━━━━━━━━━━━
-
-Before returning:
-
-✓ Valid JSON
-✓ Every question analyzed
-✓ Scores realistic
-✓ No hallucinated optimizations
-✓ Recommendation consistent with scores
-✓ Failed questions penalized properly
-✓ Compilation/runtime errors reflected
-✓ No markdown
-✓ No extra text
-
-If invalid → regenerate internally.
-`;
 
 
     try {
@@ -725,7 +455,7 @@ If invalid → regenerate internally.
     }
 }
 
-export async function StartExistingCodingTestSession(sessionToken) {
+export async function startExistingCodingTestSession({sessionToken}) {
 
     const { userId } = await auth();
 
@@ -847,7 +577,7 @@ export async function StartExistingCodingTestSession(sessionToken) {
 
 }
 
-export async function EvaluatePendingCodingAssessment({ sessionToken }) {
+export async function evaluatePendingCodingAssessment({ sessionToken }) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
@@ -892,275 +622,9 @@ export async function EvaluatePendingCodingAssessment({ sessionToken }) {
         ...session.payload
     };
 
-    const prompt = `
-You are an elite senior software engineer and coding interviewer evaluating a REAL coding assessment submission.
-
-You MUST evaluate the candidate ONLY based on:
-- The coding questions
-- The submitted solutions
-- Runtime behavior
-- Test case results
-- Code quality
-- Algorithmic quality
-- Problem-solving demonstrated in the code
-
-━━━━━━━━━━━━━━━━━━
-FULL ASSESSMENT PAYLOAD
-━━━━━━━━━━━━━━━━━━
-
-${JSON.stringify(AssessmentData, null, 2)}
-
-━━━━━━━━━━━━━━━━━━
-EVALUATION OBJECTIVE
-━━━━━━━━━━━━━━━━━━
-
-Evaluate the candidate realistically like a real FAANG/company hiring panel.
-
-Assessment may contain:
-- Multiple coding questions
-- Multiple languages
-- Passed/failed test cases
-- Compilation errors
-- Partial solutions
-
-Your evaluation MUST reflect:
-- Actual correctness
-- Algorithm quality
-- Time complexity awareness
-- Edge case handling
-- Clean coding practices
-- Problem-solving ability
-
-━━━━━━━━━━━━━━━━━━
-STRICT EVALUATION RULES
-━━━━━━━━━━━━━━━━━━
-
-1. Evaluate ONLY what is ACTUALLY present.
-
-2. NEVER assume:
-- hidden knowledge
-- unsubmitted logic
-- intended solutions
-- unstated optimizations
-
-3. Penalize for compilation/runtime/test failures ONLY IF the issue appears to originate from the candidate solution itself.
-
-IMPORTANT:
-Do NOT heavily penalize the candidate if failures may be caused by:
-- system wrapper issues
-- input parsing bugs
-- malformed wrapper logic
-- incorrect system-generated templates
-- execution environment problems
-- inconsistent testcase formatting
-- wrapper compilation failures unrelated to user logic
-
-If the submitted solution logic appears correct but execution failed due to probable wrapper/system issues:
-- mention uncertainty
-- reduce penalty severity
-- avoid harsh negative feedback
-- avoid assuming lack of technical ability
-
-Differentiate carefully between:
-- candidate logic errors
-- platform/wrapper/execution errors
-- failed test cases
-- brute force where optimization expected
-- incomplete implementations
-- empty methods
-- syntax issues
-- poor edge-case handling
-- hardcoded outputs
-- copied boilerplate without logic
-
-4. Reward:
-- passing all test cases
-- optimal algorithms
-- good naming
-- readable code
-- clean logic
-- edge-case handling
-- efficient data structures
-- concise implementations
-
-5. IMPORTANT REALISM RULES
-
-If:
-- many test cases fail
-- compilation errors exist
-- solutions are incomplete
-- only easy questions solved
-- brute force used for hard questions
-
-Then:
-- overall score should usually stay below 70
-- recommendation should NOT be "Strong Hire"
-
-6. Strong scores REQUIRE:
-- high pass rate
-- efficient solutions
-- clean implementations
-- consistency across questions
-
-7. If candidate solved only partial assessment:
-- clearly mention it
-- reduce technical/problem-solving scores
-
-8. If code quality is poor:
-- lower communication/professionalism indicators
-
-9. DO NOT hallucinate:
-- optimizations not present
-- edge-case handling not implemented
-- advanced knowledge not demonstrated
-
-10. If the candidate solution appears algorithmically correct but execution failed,
-carefully inspect whether the issue may originate from:
-- wrapper code
-- testcase parser
-- execution engine
-- generated templates
-
-In such situations:
-- reduce penalty severity
-- mention uncertainty
-- avoid assuming low technical skill
-- set possibleSystemIssue = true when appropriate
-
-━━━━━━━━━━━━━━━━━━
-QUESTION-WISE ANALYSIS RULES
-━━━━━━━━━━━━━━━━━━
-
-For EACH question evaluate:
-
-- correctness
-- whether failures originated from candidate logic or probable wrapper/system issues
-- passed test cases
-- failed test cases
-- algorithm quality
-- edge-case handling
-- code readability
-- efficiency
-
-━━━━━━━━━━━━━━━━━━
-SCORING SCALE
-━━━━━━━━━━━━━━━━━━
-
-0-30   = Very Poor
-31-50  = Weak
-51-70  = Average
-71-85  = Strong
-86-100 = Exceptional
-
-Most realistic candidates should fall between 45-75.
-
-━━━━━━━━━━━━━━━━━━
-RETURN STRICTLY VALID JSON
-━━━━━━━━━━━━━━━━━━
-
-{
-  "overallScore": 0,
-
-  "technicalScore": 0,
-
-  "problemSolvingScore": 0,
-
-  "codeQualityScore": 0,
-
-  "algorithmScore": 0,
-
-  "debuggingScore": 0,
-
-  "questionAnalysis": [
-    {
-      "questionId": 0,
-
-      "title": "string",
-
-      "difficulty": "Easy | Medium | Hard",
-
-      "passedTestCases": 0,
-
-      "totalTestCases": 0,
-
-      "score": 0,
-
-      "status":
-        "Solved | Partially Solved | Failed | Compilation Error",
-
-      "strengths": [
-        "string"
-      ],
-
-      "weaknesses": [
-        "string"
-      ],
-
-      "feedback": "string"
-    }
-  ],
-
-  "overallStrengths": [
-    "string"
-  ],
-
-  "overallWeaknesses": [
-    "string"
-  ],
-
-  "improvementTips": [
-    "string"
-  ],
-
-  "finalFeedback": "string",
-
-  "hiringRecommendation":
-    "Strong Hire | Hire | Neutral | Reject"
-}
-
-━━━━━━━━━━━━━━━━━━
-STRICT OUTPUT RULES
-━━━━━━━━━━━━━━━━━━
-
-- Return ONLY raw JSON
-- No markdown
-- No code blocks
-- No explanations
-- No extra text
-- All scores must be integers
-- All scores must be between 0-100
-- questionAnalysis MUST include every question
-- Feedback must be realistic and evidence-based
-- Do NOT invent passed test cases
-- Do NOT invent optimizations
-- Do NOT invent hidden logic
-
-━━━━━━━━━━━━━━━━━━
-SELF VALIDATION
-━━━━━━━━━━━━━━━━━━
-
-Before returning:
-
-✓ Valid JSON
-✓ Every question analyzed
-✓ Scores realistic
-✓ No hallucinated optimizations
-✓ Recommendation consistent with scores
-✓ Failed questions penalized properly
-✓ Compilation/runtime errors reflected
-✓ No markdown
-✓ No extra text
-
-If invalid → regenerate internally.
-`;
-
 
     try {
-        // console.log("prompt: ", prompt);
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        let text = response.text();
-        const cleanedText = text.replace(/```(?:json)?\n?/g, "").replace(/```/g, "").trim();
+        const cleanedText = await callAI(getEvaluationCodingAssessmentPrompt(AssessmentData));
         let evaluation;
 
         try {

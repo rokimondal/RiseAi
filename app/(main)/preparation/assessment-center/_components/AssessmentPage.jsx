@@ -145,7 +145,8 @@ const AssessmentPage = ({ assessmentData, handleSubmit, loading }) => {
             onClick={() => handleFinalSubmit()}
             disabled={loading}
           >
-            Submit
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Submit"}
+            
           </Button>
         </div>
       </div>

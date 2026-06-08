@@ -352,7 +352,7 @@ const CodingPageSteps = ({ data }) => {
             )
         case 4:
             return (
-                <CodingResult assessmentResult={assessmentResult.data} />
+                <CodingResult assessmentResult={assessmentResult} />
             )
         default:
             return null;

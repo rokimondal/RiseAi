@@ -129,6 +129,7 @@ model SimulationSession {
   updatedAt        DateTime          @updatedAt
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   result           SimulationResult?
+  parentSessionId  String?
   linkedSessionIds String[]          @default([])
 
   @@index([userId])
@@ -136,6 +137,7 @@ model SimulationSession {
   @@index([expiresAt])
   @@index([type])
   @@index([status, expiresAt])
+  @@index([parentSessionId])
 }
 
 model SimulationResult {

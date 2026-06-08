@@ -18,17 +18,10 @@ const LongAnswere = ({ index, question, handleChange, value }) => {
 
       {/* Options */}
       <div className="space-y-3">
-
         <Textarea
           value={value}
           onChange={(e) => handleChange(e.target.value)}
-          placeholder="Write your answer..."
-          rows={8}
-          className="
-            rounded-md border p-4 text-base
-            transition-all duration-200
-            focus-visible:ring-1 focus-visible:ring-primary
-          "
+          className=" rounded-md border p-4 text-lg  h-40 max-h-[200px] overflow-y-auto resize-none "
         />
       </div>
 

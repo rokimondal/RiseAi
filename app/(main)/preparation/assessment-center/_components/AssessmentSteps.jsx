@@ -430,7 +430,7 @@ const AssessmentSteps = ({ data }) => {
     switch (step) {
         case 1:
             return (
-                <InstructionPage setStep={setStep} data={data} />
+                <InstructionPage setStep={setStep} type={"normal"} />
             )
 
         case 2:

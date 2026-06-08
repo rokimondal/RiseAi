@@ -1,6 +1,6 @@
 "use client"
 
-import { EvaluateCodingAssessment, runCode } from '@/actions/company-coding-round'
+import { evaluateCodingAssessment, runCode } from '@/actions/company-coding-round'
 import { Button } from '@/components/ui/button'
 import useFetch from '@/hooks/use-fetch'
 import { Editor } from '@monaco-editor/react'
@@ -40,7 +40,7 @@ const CodingPage = ({ assesmentData, setAssessmentResult }) => {
   const hasCustom = allTestCases.length > baseCount;
 
   const { loading: executing, fn: executionFn, data: executionResult } = useFetch(runCode);
-  const { loading: submiting, fn: submitionFn, data: submitionResult } = useFetch(EvaluateCodingAssessment);
+  const { loading: submiting, fn: submitionFn, data: submitionResult } = useFetch(evaluateCodingAssessment);
 
 
   useEffect(() => {
@@ -186,18 +186,18 @@ const CodingPage = ({ assesmentData, setAssessmentResult }) => {
   const handleSubmitCode = async () => {
     try {
       const codes = assesmentData.questions.map(
-          (question) => ({
-            questionId: question.id,
+        (question) => ({
+          questionId: question.id,
 
-            language:
-              assesmentData
-                ?.assessmentMetadata
-                ?.programmingLanguage,
+          language:
+            assesmentData
+              ?.assessmentMetadata
+              ?.programmingLanguage,
 
-            code:
-              codeMap[question.id] || "",
-          })
-        );
+          code:
+            codeMap[question.id] || "",
+        })
+      );
 
       const timeTaken =
         (totalDuration * 60) - timeLeft;
