@@ -1,7 +1,7 @@
 "use server"
 
 import { callAI } from "@/Ai/callAI";
-import { getGenerateQuizPrompt } from "@/Ai/prompts/mockTest";
+import { getGenerateQuizPrompt, getImprovementTipPrompt } from "@/Ai/prompts/mockTest";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
@@ -65,20 +65,9 @@ export async function saveQuizResult(questions, answeres, score) {
             )
             .join("\n\n");
 
-        const improvementPrompt = `
-      The user got the following ${user.industry} technical interview questions wrong:
-      
-      ${wrongQuestionsText}
-
-      Based on these mistakes, provide a concise, specific improvement tip.
-      Focus on the knowledge gaps revealed by these wrong answers.
-      Keep the response under 2 sentences and make it encouraging.
-      Don't explicitly mention the mistakes, instead focus on what to learn/practice.
-    `;
-
         try {
-            const tipResult = await model.generateContent(improvementPrompt)
-            improvementTip = tipResult.response.text().trim();
+            const result = await callAI(getImprovementTipPrompt);
+            improvementTip = result.improvementTip || null;
         } catch (error) {
             console.error("Error generating improvement tip:", error.message);
         }

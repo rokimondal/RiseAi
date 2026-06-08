@@ -1,0 +1,44 @@
+
+export const CREDIT_COST = {
+    GENERATION: {
+        SINGLE_SELECT: 0.10,
+        MULTI_SELECT: 0.15,
+        SHORT_ANSWER: 0.30,
+        LONG_ANSWER: 0.75,
+    },
+
+    EVALUATION: {
+        SHORT_ANSWER: 0.25,
+        LONG_ANSWER: 0.75,
+    },
+};
+
+export const MINIMUM_GENERATION_CREDITS = 10;
+export const EVALUATION_CALL_CREDITS = 2;
+
+
+
+
+
+export const ASSESSMENT_GENERATION_CREDITS = 20;
+export const ASSESSMENT_EVALUATION_CREDITS = 10;
+
+
+
+
+
+export const SIMULATION_GENERATION_CREDITS = 5;
+export const SIMULATION_EVALUATION_CREDITS = 10;
+
+
+
+
+
+
+export const INTERVIEW_GENERATION_CREDITS = 10;
+
+export const INTERVIEW_EVALUATION_CREDITS = 10;
+
+export const INTERVIEW_PER_MINUTE_CREDITS = 2;
+
+export const MINIMUM_INTERVIEW_MINUTES = 10;

@@ -1,6 +1,6 @@
 "use client"
 
-import { EvaluateInterview, generateInterviewQuestion } from '@/actions/mock-interview';
+import { evaluateInterview, generateInterviewQuestion } from '@/actions/mock-interview';
 import { interviewSchema } from '@/app/lib/schema';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,7 +27,7 @@ const InterviewPageSteps = ({ data }) => {
     const [resumeContent, setResumeContent] = useState("");
 
     const { loading: generating, fn: generateInterviewQuestionFn, data: generatedInterviewQuestion } = useFetch(generateInterviewQuestion);
-    const { loading: evaluating, fn: evaluateFn, data: result } = useFetch(EvaluateInterview);
+    const { loading: evaluating, fn: evaluateFn, data: result } = useFetch(evaluateInterview);
 
     const setAfterResumePage = () => {
         setStep(4);

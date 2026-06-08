@@ -10,8 +10,10 @@ import {
     PlayCircle,
     Building2,
     Briefcase,
+    XCircle,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { BarLoader } from "react-spinners";
 
 const getRoundTypeLabel = (type) => {
     switch (type) {
@@ -29,7 +31,30 @@ const getRoundTypeLabel = (type) => {
     }
 };
 
-const MainSimulationPage = ({ planData }) => {
+const MainSimulationPage = ({ planData, setCurrRoundData, loading }) => {
+
+    console.log(planData);
+
+    if (loading) {
+        return <BarLoader className='mt-4' width={"100%"} color='gray' />
+    }
+
+    if (!loading && !planData) {
+        return (
+            <div className="flex items-center justify-center min-h-[300px]">
+                <Card className="shadow-none border-none">
+                    <CardContent className="p-6 text-center">
+                        <h2 className="text-lg font-semibold">No Data Found</h2>
+                        <p className="text-sm text-muted-foreground mt-2">
+                            Unable to load the simulation plan.
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
+
     const simulation = planData?.session?.payload;
 
     const metadata = simulation?.simulationMetadata;
@@ -62,6 +87,10 @@ const MainSimulationPage = ({ planData }) => {
             (1000 * 60 * 60 * 24)
         )
     );
+
+    const handleStartRound = async () => {
+        setCurrRoundData(currentRound);
+    }
 
     return (
         <div className="max-w-5xl mx-auto px-3 py-4 md:px-6 md:py-6 space-y-4 md:space-y-6">
@@ -178,7 +207,10 @@ const MainSimulationPage = ({ planData }) => {
                             </Badge>
                         </div>
 
-                        <Button className="w-full sm:w-auto mt-5">
+                        <Button
+                            onClick={handleStartRound}
+                            className="w-full sm:w-auto mt-5"
+                        >
                             Start Round
                         </Button>
 
@@ -221,6 +253,8 @@ const MainSimulationPage = ({ planData }) => {
                                 const isLocked =
                                     round.status === "LOCKED";
 
+                                const isFailed = round.status === "FAILED";
+
                                 return (
                                     <div
                                         key={round.roundId}
@@ -246,6 +280,12 @@ const MainSimulationPage = ({ planData }) => {
                                             {isLocked && (
                                                 <div className="relative z-10 h-10 w-10 rounded-full bg-muted flex items-center justify-center">
                                                     <Lock className="h-5 w-5 text-muted-foreground" />
+                                                </div>
+                                            )}
+
+                                            {isFailed && (
+                                                <div className="relative z-10 h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                                                    <XCircle className="h-5 w-5 text-red-600" />
                                                 </div>
                                             )}
 

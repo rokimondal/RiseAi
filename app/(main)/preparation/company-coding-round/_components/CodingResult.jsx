@@ -17,7 +17,13 @@ const recommendationVariant = {
 
 const CodingResult = ({ assessmentResult }) => {
 
-    const data = assessmentResult;
+    if (!assessmentResult.success) {
+        <Card className="border-none shadow-none" >
+            <p>{result.data.message}</p>
+        </Card>
+    }
+
+    const data = assessmentResult.data;
 
     if (!data) {
         return (

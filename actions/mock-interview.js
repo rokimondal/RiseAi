@@ -2,17 +2,11 @@
 
 import { callAI } from "@/Ai/callAI";
 import { getEvaluationInterviewPrompt, getGenerateInterviewPrompt } from "@/Ai/prompts/mockInterview";
+import { MINIMUM_INTERVIEW_MINUTES, INTERVIEW_GENERATION_CREDITS, INTERVIEW_EVALUATION_CREDITS, INTERVIEW_PER_MINUTE_CREDITS } from "@/util/costs";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import crypto from "crypto";
 
-const INTERVIEW_GENERATION_CREDITS = 10;
-
-const INTERVIEW_EVALUATION_CREDITS = 10;
-
-const INTERVIEW_PER_MINUTE_CREDITS = 2;
-
-const MINIMUM_INTERVIEW_MINUTES = 10;
 
 export async function generateInterviewQuestion({ companyName, jobTitle, jobDescription, interviewType, resumeContent }) {
     const { userId } = await auth();
@@ -114,50 +108,47 @@ export async function generateInterviewQuestion({ companyName, jobTitle, jobDesc
         }
 
         console.log("interviewDetails", interviewDetails);
-        let simulationSession;
-        try {
+        const [simulationSession, updatedUser] =
+            await db.$transaction(async (tx) => {
 
-            simulationSession = await db.simulationSession.create({
-                data: {
-                    userId: user.id,
-                    type: "MOCK_INTERVIEW",
-                    status: "STARTED",
-                    creditsUsed: INTERVIEW_GENERATION_CREDITS,
-                    payload: {
-                        companyName,
-                        jobTitle,
-                        jobDescription,
-                        interviewType,
-                        resumeContent,
-                        interviewPlan: interviewDetails,
-                    },
+                const simulationSession =
+                    await tx.simulationSession.create({
+                        data: {
+                            userId: user.id,
+                            type: "MOCK_INTERVIEW",
+                            status: "STARTED",
+                            creditsUsed: INTERVIEW_GENERATION_CREDITS,
+                            payload: {
+                                companyName,
+                                jobTitle,
+                                jobDescription,
+                                interviewType,
+                                resumeContent,
+                                interviewPlan: interviewDetails,
+                            },
+                            startedAt: new Date(),
+                            durationSeconds:
+                                interviewDetails.totalDuration * 60,
+                            expiresAt: new Date(
+                                Date.now() + 1000 * 60 * 60 * 24 * 30
+                            ),
+                        },
+                    });
 
-                    startedAt: new Date(),
-                    durationSeconds: interviewDetails.totalDuration * 60,
+                const updatedUser =
+                    await tx.user.update({
+                        where: {
+                            id: user.id,
+                        },
+                        data: {
+                            credits: {
+                                decrement:
+                                    INTERVIEW_GENERATION_CREDITS,
+                            },
+                        },
+                    });
 
-                    expiresAt: new Date(
-                        Date.now() + 1000 * 60 * 60 * 24 * 30
-                    ),
-                },
-            });
-        } catch (error) {
-            console.error("Simulation session creation error:", error);
-
-            throw new Error("Failed to create simulation session");
-        }
-
-        const updatedUser =
-            await db.user.update({
-                where: {
-                    id: user.id,
-                },
-
-                data: {
-                    credits: {
-                        decrement:
-                            INTERVIEW_GENERATION_CREDITS,
-                    },
-                },
+                return [simulationSession, updatedUser];
             });
 
         return {
@@ -176,7 +167,7 @@ export async function generateInterviewQuestion({ companyName, jobTitle, jobDesc
     }
 }
 
-export async function EvaluateInterview({ interviewConversation, sessionToken, timeTaken }) {
+export async function evaluateInterview({ interviewConversation, sessionToken, timeTaken }) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
@@ -514,7 +505,7 @@ export async function EvaluateInterview({ interviewConversation, sessionToken, t
     }
 }
 
-export async function StartExistingInterviewSession({ sessionToken }) {
+export async function startExistingInterviewSession({ sessionToken }) {
 
     const { userId } = await auth();
 
@@ -655,7 +646,7 @@ export async function StartExistingInterviewSession({ sessionToken }) {
     }
 }
 
-export async function EvaluatePendingInterview({
+export async function evaluatePendingInterview({
     sessionToken,
 }) {
 
@@ -765,148 +756,8 @@ export async function EvaluatePendingInterview({
     maskedContent = maskAll(maskedContent, linkedins, PLACEHOLDERS.linkedin);
     maskedContent = maskAll(maskedContent, twitters, PLACEHOLDERS.twitter);
 
-    const prompt = `
-You are a senior technical interviewer evaluating a REAL interview transcript.
-
-You MUST evaluate ONLY what the candidate ACTUALLY demonstrated in the interview conversation.
-
-━━━━━━━━━━━━━━━━━━
-FULL INTERVIEW PAYLOAD
-━━━━━━━━━━━━━━━━━━
-
-${JSON.stringify(payload, null, 2)}
-
-━━━━━━━━━━━━━━━━━━
-CRITICAL RULES
-━━━━━━━━━━━━━━━━━━
-
-1. Evaluate ONLY from:
-- Interview conversation
-- Candidate responses
-- Technical explanations
-- Communication
-- Problem solving
-- Confidence
-- Behavioral quality
-
-2. NEVER assume skills from:
-- Resume
-- Listed technologies
-- Claimed experience
-- Project names
-- Certifications
-- Education
-
-unless they were clearly demonstrated in the conversation.
-
-3. If transcript quality is poor:
-- lower confidence
-- lower technical scores
-- mention limitations in feedback
-
-4. Penalize:
-- vague answers
-- filler responses
-- generic explanations
-- shallow technical depth
-- inability to explain decisions
-- lack of examples
-- interviewer carrying the conversation
-- repeated non-answers
-
-5. IMPORTANT REALISM RULES
-
-If:
-- interview duration was very short
-- few meaningful answers exist
-- technical depth is limited
-- communication is weak
-
-Then:
-- overall score should usually stay below 70
-- recommendation should NOT be "Strong Hire"
-
-6. Strong scores REQUIRE demonstrated evidence in the transcript.
-
-7. DO NOT hallucinate:
-- professionalism
-- leadership
-- confidence
-- technical expertise
-- communication quality
-
-unless clearly visible in the conversation.
-
-8. If conversation is missing, empty, or extremely short:
-- give low-to-moderate scores
-- explain insufficient evidence
-
-9. Scores must feel realistic like a real hiring panel.
-
-━━━━━━━━━━━━━━━━━━
-SCORING SCALE
-━━━━━━━━━━━━━━━━━━
-
-0-30   = Very Poor
-31-50  = Weak
-51-70  = Average
-71-85  = Strong
-86-100 = Exceptional
-
-Most real candidates should fall between 45-75.
-
-━━━━━━━━━━━━━━━━━━
-OUTPUT FORMAT
-━━━━━━━━━━━━━━━━━━
-
-Return ONLY valid JSON.
-
-{
-  "overallScore": 0,
-  "communicationScore": 0,
-  "technicalScore": 0,
-  "problemSolvingScore": 0,
-  "behavioralScore": 0,
-  "confidenceScore": 0,
-
-  "strengths": [
-    "string"
-  ],
-
-  "weaknesses": [
-    "string"
-  ],
-
-  "improvementTips": [
-    "string"
-  ],
-
-  "finalFeedback": "string",
-
-  "hiringRecommendation":
-    "Strong Hire | Hire | Neutral | Reject"
-}
-
-━━━━━━━━━━━━━━━━━━
-STRICT OUTPUT RULES
-━━━━━━━━━━━━━━━━━━
-
-- Return ONLY raw JSON
-- No markdown
-- No code blocks
-- No explanations
-- No extra text
-- Scores must be integers
-- Scores must be between 0-100
-- Keep feedback realistic and evidence-based
-`;
-
     try {
-
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        let text = response.text();
-        const cleanedText = text.replace(/```(?:json)?\n?/g, "").replace(/```/g, "").trim();
+        const cleanedText = await callAI(getEvaluationInterviewPrompt(payload));
 
         let evaluation;
         try {
