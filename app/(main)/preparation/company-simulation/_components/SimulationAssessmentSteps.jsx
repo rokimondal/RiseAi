@@ -103,6 +103,18 @@ const SimulationAssessmentSteps = ({ roundData, metaData, handleBackToMainPage }
         }
     }
 
+    const handlePendingEvaluation = async () => {
+            try {
+                await evaluationFn({
+                    parentSessionId: metaData.parentSessionId,
+                    roundId: roundData.roundId,
+                    roundSessionToken: session.sessionToken,
+                });
+            } catch (error) {
+                toast.error(error.message || "Failed to evaluate assessment");
+            }
+        };
+
     // const sessionStatus = sessionData?.data?.session?.status;  // STARTED  SUBMITTED  EVALUATION_PENDING  EXPIRED
     // console.log(sessionStatus);
 
@@ -127,7 +139,7 @@ const SimulationAssessmentSteps = ({ roundData, metaData, handleBackToMainPage }
                         Evaluate your assessment to view the result and continue the simulation.
                     </p>
 
-                    <Button onClick={handleEvaluateAssessment}>
+                    <Button onClick={handlePendingEvaluation}>
                         Evaluate Assessment
                     </Button>
                 </div>

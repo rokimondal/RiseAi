@@ -6,10 +6,8 @@ import { ASSESSMENT_EVALUATION_CREDITS, ASSESSMENT_GENERATION_CREDITS } from "@/
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import crypto from "crypto";
+import { sanitizeCodeAssessmentData } from "@/util/helperfunctions";
 
-export async function sanitizeAssessmentData(data) {
-    return JSON.parse(JSON.stringify(data));
-}
 
 export async function generateCodingAssessment(data) {
     //
@@ -87,7 +85,7 @@ export async function generateCodingAssessment(data) {
             throw new Error("AI returned invalid assessment format");
         }
 
-        const finalAssessment = {
+        const finalAssessment = sanitizeCodeAssessmentData({
             assessmentMetadata: {
                 assessmentMode: data.assessmentMode,
                 mode: assessmentMode,
@@ -100,7 +98,9 @@ export async function generateCodingAssessment(data) {
                 programmingLanguage,
             },
             questions: parsed.questions,
-        };
+        });
+
+        console.log(finalAssessment);
 
         const [session, updatedUser] =
             await db.$transaction([
@@ -110,7 +110,7 @@ export async function generateCodingAssessment(data) {
                         type: "CODING_ROUND",
                         status: "STARTED",
                         sessionToken: crypto.randomUUID(),
-                        creditsUsed: ASSESSMENT_GENERATION_CREDITS, payload: sanitizeAssessmentData(finalAssessment),
+                        creditsUsed: ASSESSMENT_GENERATION_CREDITS, payload: finalAssessment,
                         startedAt: new Date(),
                         durationSeconds: finalAssessment.assessmentMetadata.totalDurationMinutes * 60,
                         expiresAt: new Date(
@@ -132,6 +132,7 @@ export async function generateCodingAssessment(data) {
                 })
             ])
 
+            console.log(JSON.stringify(session));
 
         return {
             success: true,
@@ -139,7 +140,7 @@ export async function generateCodingAssessment(data) {
                 sessionId: session.id,
                 sessionToken: session.sessionToken,
                 remainingCredits: updatedUser.credits,
-                ...finalAssessment,
+                ...session.payload,
                 userName: user.name
             }
         };
@@ -455,7 +456,7 @@ export async function evaluateCodingAssessment({ codes, sessionToken, timeTaken 
     }
 }
 
-export async function startExistingCodingTestSession({sessionToken}) {
+export async function startExistingCodingTestSession({ sessionToken }) {
 
     const { userId } = await auth();
 

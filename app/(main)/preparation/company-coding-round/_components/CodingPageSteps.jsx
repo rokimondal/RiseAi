@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import InstructionPage from './InstructionPage';
 import CodingForm from './CodingForm';
 import CodingPage from './CodingPage';
-import { generateCodingAssessment } from '@/actions/company-coding-round';
+import { evaluateCodingAssessment, generateCodingAssessment } from '@/actions/company-coding-round';
 import useFetch from '@/hooks/use-fetch';
 import { toast } from 'sonner';
 import CodingResult from './CodingResult';
@@ -12,27 +12,29 @@ import CodingResult from './CodingResult';
 const CodingPageSteps = ({ data }) => {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState(data.formData);
-    const [assessmentResult, setAssessmentResult] = useState(null);
 
     const { loading: generating, fn: generateAssesmentFn, data: generatedAssesment } = useFetch(generateCodingAssessment);
+    const { loading: submiting, fn: submitionFn, data: submitionResult } = useFetch(evaluateCodingAssessment);
 
     useEffect(() => {
         console.log(formData);
     }, [formData])
 
     useEffect(() => {
-        if (generatedAssesment) {
+        if (generatedAssesment?.success) {
             console.log(generatedAssesment);
             setStep(3);
         }
     }, [generatedAssesment])
 
     useEffect(() => {
-        if (assessmentResult) {
-            console.log(assessmentResult);
+
+        if (submitionResult?.success) {
+            console.log(submitionResult);
             setStep(4);
         }
-    }, [assessmentResult])
+
+    }, [submitionResult]);
 
     const handleStartAssesment = async (values) => {
         try {
@@ -43,6 +45,17 @@ const CodingPageSteps = ({ data }) => {
             }
         } catch (error) {
             toast.error(error.message || "Failed to Design Coding Assesment");
+        }
+    }
+
+    const handleSubmit = async (value) => {
+        try {
+
+            console.log(value);
+            await submitionFn(value);
+        } catch (error) {
+            console.error(error);
+            toast.error(error.message || "Failed to Execute your code");
         }
     }
 
@@ -159,7 +172,7 @@ const CodingPageSteps = ({ data }) => {
             ]
         }
     }
-    
+
     const dummyResult = {
         "success": true,
         "data": {
@@ -338,7 +351,7 @@ const CodingPageSteps = ({ data }) => {
     switch (step) {
         case 1:
             return (
-                <InstructionPage setStep={setStep} data={data} />
+                <InstructionPage setStep={setStep} type={"normal"} />
             )
 
         case 2:
@@ -348,11 +361,15 @@ const CodingPageSteps = ({ data }) => {
 
         case 3:
             return (
-                <CodingPage assesmentData={generatedAssesment.data} setAssessmentResult={setAssessmentResult} />
+                <CodingPage
+                    assesmentData={generatedAssesment.data}
+                    handleSubmit={handleSubmit}
+                    submiting={submiting}
+                />
             )
         case 4:
             return (
-                <CodingResult assessmentResult={assessmentResult} />
+                <CodingResult assessmentResult={submitionResult} />
             )
         default:
             return null;

@@ -195,7 +195,7 @@ const InterviewPageSteps = ({ data }) => {
     switch (step) {
         case 1:
             return (
-                <IntroductionPage setStep={setStep} data={data} />
+                <IntroductionPage setStep={setStep} />
             )
 
         case 2:

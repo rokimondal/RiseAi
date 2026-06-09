@@ -16,6 +16,7 @@ const recommendationVariant = {
 };
 
 const CodingResult = ({ assessmentResult }) => {
+    console.log("assessmentResult:", assessmentResult);
 
     if (!assessmentResult.success) {
         <Card className="border-none shadow-none" >

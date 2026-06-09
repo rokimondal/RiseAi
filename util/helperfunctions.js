@@ -633,3 +633,17 @@ export function calculateAssessmentCredits(questions, type = "GENERATION") {
         Math.ceil(total)
     );
 }
+
+export function sanitizeCodeAssessmentData(data) {
+    try {
+        const json = JSON.stringify(data);
+
+        if (json === undefined) {
+            throw new Error("Data is not JSON serializable");
+        }
+
+        return JSON.parse(json);
+    } catch (error) {
+        throw new Error("Invalid JSON data");
+    }
+}
