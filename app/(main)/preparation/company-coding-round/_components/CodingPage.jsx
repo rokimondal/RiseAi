@@ -9,7 +9,8 @@ import { useTheme } from 'next-themes'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-const CodingPage = ({ assesmentData, setAssessmentResult }) => {
+const CodingPage = ({ assesmentData, submiting, handleSubmit }) => {
+  console.log(assesmentData)
 
   const { resolvedTheme } = useTheme();
 
@@ -40,7 +41,6 @@ const CodingPage = ({ assesmentData, setAssessmentResult }) => {
   const hasCustom = allTestCases.length > baseCount;
 
   const { loading: executing, fn: executionFn, data: executionResult } = useFetch(runCode);
-  const { loading: submiting, fn: submitionFn, data: submitionResult } = useFetch(evaluateCodingAssessment);
 
 
   useEffect(() => {
@@ -174,17 +174,11 @@ const CodingPage = ({ assesmentData, setAssessmentResult }) => {
 
   }
 
-  useEffect(() => {
 
-    if (submitionResult?.success) {
-      console.log(submitionResult);
-      setAssessmentResult(submitionResult);
-    }
-
-  }, [submitionResult]);
 
   const handleSubmitCode = async () => {
     try {
+      console.log("hihdscb",assesmentData);
       const codes = assesmentData.questions.map(
         (question) => ({
           questionId: question.id,
@@ -202,11 +196,11 @@ const CodingPage = ({ assesmentData, setAssessmentResult }) => {
       const timeTaken =
         (totalDuration * 60) - timeLeft;
 
-      await submitionFn({
+      handleSubmit?.({
         codes,
         sessionToken: assesmentData.sessionToken,
         timeTaken
-      });
+      })
     } catch (error) {
       console.error(error);
       toast.error(error.message || "Failed to Execute your code");

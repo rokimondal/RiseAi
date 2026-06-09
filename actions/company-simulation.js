@@ -7,11 +7,13 @@ import { auth } from "@clerk/nextjs/server";
 import crypto from "crypto";
 import { MINIMUM_GENERATION_CREDITS, ASSESSMENT_GENERATION_CREDITS, INTERVIEW_EVALUATION_CREDITS, INTERVIEW_GENERATION_CREDITS, INTERVIEW_PER_MINUTE_CREDITS, MINIMUM_INTERVIEW_MINUTES, SIMULATION_GENERATION_CREDITS, SIMULATION_EVALUATION_CREDITS } from "@/util/costs";
 import { getRolePlannerPrompt, getRoleSectionGenerator } from "@/Ai/prompts/assessmentCenter";
-import { calculateAssessmentCredits, validateGeneratedSection, validatePlannerResponse, validateSimulationPlan } from "@/util/helperfunctions";
+import { calculateAssessmentCredits, sanitizeCodeAssessmentData, validateGeneratedSection, validatePlannerResponse, validateSimulationPlan } from "@/util/helperfunctions";
 import { evaluateAssessmentCenter, evaluatePendingAssessmentCenter } from "./assessment-center";
 import { evaluateCodingAssessment, evaluatePendingCodingAssessment } from "./company-coding-round";
 import { evaluateInterview, evaluatePendingInterview } from "./mock-interview";
 import { success } from "zod";
+import { getGenerateRoleBasedCodingAssessmentPrompt } from "@/Ai/prompts/companyCoding";
+import { getGenerateInterviewPrompt } from "@/Ai/prompts/mockInterview";
 
 
 export async function generateSimulationPlan({ companyName, jobTitle, jobDescription, resumeContent, experienceLevel, hiringType }) {
@@ -558,9 +560,10 @@ export async function simulationCodingGenerator(data) {
             throw new Error("AI returned invalid assessment format");
         }
 
-        const finalAssessment = {
+        console.log(parsed);
+        const finalAssessment = sanitizeCodeAssessmentData({
             assessmentMetadata: {
-                assessmentMode: data.assessmentMode,
+                assessmentMode: 'ROLE_BASED',
                 mode: 'ROLE_BASED',
                 companyName,
                 examOrRole: role,
@@ -570,7 +573,10 @@ export async function simulationCodingGenerator(data) {
                 programmingLanguage,
             },
             questions: parsed.questions,
-        };
+        });
+        console.log(finalAssessment)
+        console.log(parsed.assessmentMetadata)
+        console.log(parsed.assessmentMetadata.totalDurationMinutes)
 
         const [session, updatedUser] = await db.$transaction(
             async (tx) => {

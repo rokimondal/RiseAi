@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,12 @@ import {
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { BarLoader } from "react-spinners";
+import useFetch from "@/hooks/use-fetch";
+import { getSessionResultDetails } from "@/actions/sessions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import InterviewResult from "../../mock-interview/_components/InterviewResult";
+import CodingResult from "../../company-coding-round/_components/CodingResult";
+import AssessmentResult from "../../assessment-center/_components/AssessmentResult";
 
 const getRoundTypeLabel = (type) => {
     switch (type) {
@@ -33,7 +39,12 @@ const getRoundTypeLabel = (type) => {
 
 const MainSimulationPage = ({ planData, setCurrRoundData, loading }) => {
 
+    const [open, setOpen] = useState(false);
+    const [selectedRound, setSelectedRound] = useState(null);
+    const { loading: fetchingResult, fn: fetchResultFn, data: fetchedResult } = useFetch(getSessionResultDetails);
+
     console.log(planData);
+    const sessionType = fetchedResult?.data?.session?.type;
 
     if (loading) {
         return <BarLoader className='mt-4' width={"100%"} color='gray' />
@@ -92,265 +103,340 @@ const MainSimulationPage = ({ planData, setCurrRoundData, loading }) => {
         setCurrRoundData(currentRound);
     }
 
+    const handleRoundClick = async (round) => {
+        if (
+            round.status !== "PASSED" &&
+            round.status !== "FAILED"
+        ) {
+            return;
+        }
+
+        setSelectedRound(round);
+        setOpen(true);
+
+        console.log(round.sessionId);
+
+        await fetchResultFn({
+            sessionId: round.sessionId,
+        });
+    };
+
+    useEffect(() => {
+        console.log("------------", fetchedResult)
+    }, [fetchedResult])
+
     return (
-        <div className="max-w-5xl mx-auto px-3 py-4 md:px-6 md:py-6 space-y-4 md:space-y-6">
+        <>
+            <div className="max-w-5xl mx-auto px-3 py-4 md:px-6 md:py-6 space-y-4 md:space-y-6">
 
-            {/* Hero */}
+                {/* Hero */}
 
-            <Card>
-                <CardContent className="p-4 md:p-6">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+                <Card>
+                    <CardContent className="p-4 md:p-6">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
 
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-bold">
-                                {metadata.companyName}
-                            </h1>
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-bold">
+                                    {metadata.companyName}
+                                </h1>
 
-                            <div className="flex items-center gap-2 mt-2 text-muted-foreground">
-                                <Briefcase className="w-4 h-4" />
-                                <span>{metadata.role}</span>
+                                <div className="flex items-center gap-2 mt-2 text-muted-foreground">
+                                    <Briefcase className="w-4 h-4" />
+                                    <span>{metadata.role}</span>
+                                </div>
+
+                                <div className="flex flex-wrap gap-2 mt-4">
+                                    <Badge>
+                                        {metadata.experienceLevel}
+                                    </Badge>
+
+                                    <Badge variant="secondary">
+                                        {metadata.hiringType}
+                                    </Badge>
+                                </div>
                             </div>
+
+                            <div className="grid grid-cols-3">
+
+                                <div className="rounded-lg p-3 text-center">
+                                    <p className="text-xs text-muted-foreground">
+                                        Time Remaining
+                                    </p>
+
+                                    <p className="text-lg font-bold">
+                                        {daysLeft}
+                                    </p>
+
+                                    <p className="text-xs text-muted-foreground">
+                                        Days
+                                    </p>
+                                </div>
+
+                                <div className="rounded-lg p-3 text-center">
+                                    <p className="text-xs text-muted-foreground">
+                                        Rounds
+                                    </p>
+
+                                    <p className="text-lg font-bold">
+                                        {metadata.totalRounds}
+                                    </p>
+
+                                    <p className="text-xs text-muted-foreground">
+                                        Total
+                                    </p>
+                                </div>
+
+                                <div className="rounded-lg p-3 text-center">
+                                    <p className="text-xs text-muted-foreground">
+                                        Progress
+                                    </p>
+
+                                    <p className="text-lg font-bold">
+                                        {progress}%
+                                    </p>
+
+                                    <p className="text-xs text-muted-foreground">
+                                        Complete
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <Progress value={progress} className="mt-2" />
+                    </CardContent>
+                </Card>
+
+                {/* Current Round */}
+
+                {currentRound && (
+                    <Card className="border-primary shadow-md">
+
+                        <CardContent className="p-4 md:p-6">
+
+                            <Badge className="mb-3">
+                                Active Round
+                            </Badge>
+
+                            <h2 className="text-lg font-semibold">
+                                {currentRound.roundName}
+                            </h2>
+
+                            <p className="text-sm text-muted-foreground mt-2">
+                                {currentRound.purpose}
+                            </p>
 
                             <div className="flex flex-wrap gap-2 mt-4">
                                 <Badge>
-                                    {metadata.experienceLevel}
+                                    {getRoundTypeLabel(currentRound.roundType)}
                                 </Badge>
 
                                 <Badge variant="secondary">
-                                    {metadata.hiringType}
+                                    {currentRound.difficulty}
+                                </Badge>
+
+                                <Badge variant="outline">
+                                    Pass: {currentRound.passingScore}%
                                 </Badge>
                             </div>
-                        </div>
 
-                        <div className="grid grid-cols-3">
+                            <Button
+                                onClick={handleStartRound}
+                                className="w-full sm:w-auto mt-5"
+                            >
+                                Start Round
+                            </Button>
 
-                            <div className="rounded-lg p-3 text-center">
-                                <p className="text-xs text-muted-foreground">
-                                    Time Remaining
-                                </p>
+                        </CardContent>
 
-                                <p className="text-lg font-bold">
-                                    {daysLeft}
-                                </p>
+                    </Card>
+                )}
 
-                                <p className="text-xs text-muted-foreground">
-                                    Days
-                                </p>
-                            </div>
+                {/* Timeline */}
 
-                            <div className="rounded-lg p-3 text-center">
-                                <p className="text-xs text-muted-foreground">
-                                    Rounds
-                                </p>
-
-                                <p className="text-lg font-bold">
-                                    {metadata.totalRounds}
-                                </p>
-
-                                <p className="text-xs text-muted-foreground">
-                                    Total
-                                </p>
-                            </div>
-
-                            <div className="rounded-lg p-3 text-center">
-                                <p className="text-xs text-muted-foreground">
-                                    Progress
-                                </p>
-
-                                <p className="text-lg font-bold">
-                                    {progress}%
-                                </p>
-
-                                <p className="text-xs text-muted-foreground">
-                                    Complete
-                                </p>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <Progress value={progress} className="mt-2" />
-                </CardContent>
-            </Card>
-
-            {/* Current Round */}
-
-            {currentRound && (
-                <Card className="border-primary shadow-md">
+                <Card>
 
                     <CardContent className="p-4 md:p-6">
 
-                        <Badge className="mb-3">
-                            Active Round
-                        </Badge>
+                        <div className="mb-4">
+                            <h2 className="text-xl font-semibold">
+                                Hiring Process
+                            </h2>
 
-                        <h2 className="text-lg font-semibold">
-                            {currentRound.roundName}
-                        </h2>
-
-                        <p className="text-sm text-muted-foreground mt-2">
-                            {currentRound.purpose}
-                        </p>
-
-                        <div className="flex flex-wrap gap-2 mt-4">
-                            <Badge>
-                                {getRoundTypeLabel(currentRound.roundType)}
-                            </Badge>
-
-                            <Badge variant="secondary">
-                                {currentRound.difficulty}
-                            </Badge>
-
-                            <Badge variant="outline">
-                                Pass: {currentRound.passingScore}%
-                            </Badge>
+                            <p className="text-sm text-muted-foreground">
+                                Track your progress through each hiring stage
+                            </p>
                         </div>
 
-                        <Button
-                            onClick={handleStartRound}
-                            className="w-full sm:w-auto mt-5"
-                        >
-                            Start Round
-                        </Button>
+                        <div className="relative">
+
+                            {/* Desktop Timeline Line */}
+
+                            <div className="space-y-5">
+
+                                {rounds.map((round, index) => {
+
+                                    const isPassed =
+                                        round.status === "PASSED";
+
+                                    const isCurrent =
+                                        round.status === "PENDING" ||
+                                        round.status === "IN_PROGRESS";
+
+                                    const isLocked =
+                                        round.status === "LOCKED";
+
+                                    const isFailed = round.status === "FAILED";
+
+                                    return (
+                                        <div
+                                            key={round.roundId}
+                                            className="relative flex gap-4"
+                                        >
+
+                                            {/* Timeline Icon */}
+
+                                            <div className="relative shrink-0">
+
+                                                {isPassed && (
+                                                    <div className="relative z-10 h-10 w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                                                        <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                                    </div>
+                                                )}
+
+                                                {isCurrent && (
+                                                    <div className="relative z-10 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                                        <PlayCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                                    </div>
+                                                )}
+
+                                                {isLocked && (
+                                                    <div className="relative z-10 h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                                                        <Lock className="h-5 w-5 text-muted-foreground" />
+                                                    </div>
+                                                )}
+
+                                                {isFailed && (
+                                                    <div className="relative z-10 h-10 w-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                                                        <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                                                    </div>
+                                                )}
+
+                                                {index !== rounds.length - 1 && (
+                                                    <div className="absolute left-1/2 top-10 -translate-x-1/2 h-[calc(100%+20px)] w-[2px] bg-border" />
+                                                )}
+
+                                            </div>
+
+                                            {/* Round Card */}
+
+                                            <Card
+                                                onClick={() => handleRoundClick(round)}
+                                                className={` flex-1 ${isCurrent
+                                                    ? "border-primary shadow-sm"
+                                                    : ""
+                                                    } ${(round.status === "PASSED" ||
+                                                        round.status === "FAILED") && "hover:cursor-pointer"}`}
+                                            >
+                                                <CardContent className="p-4">
+
+                                                    <div className="flex flex-col gap-3">
+
+                                                        <div>
+                                                            <h3 className="font-semibold">
+                                                                {round.roundName}
+                                                            </h3>
+
+                                                            <p className="text-sm text-muted-foreground mt-1">
+                                                                {round.purpose}
+                                                            </p>
+                                                        </div>
+
+                                                        <div className="flex flex-wrap gap-2">
+
+                                                            <Badge variant="secondary">
+                                                                {getRoundTypeLabel(round.roundType)}
+                                                            </Badge>
+
+                                                            <Badge>
+                                                                {round.difficulty}
+                                                            </Badge>
+
+                                                            <Badge variant="outline">
+                                                                Pass: {round.passingScore}%
+                                                            </Badge>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </CardContent>
+                                            </Card>
+
+                                        </div>
+                                    );
+                                })}
+
+                            </div>
+
+                        </div>
 
                     </CardContent>
 
                 </Card>
-            )}
 
-            {/* Timeline */}
+            </div>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="w-[95vw] sm:max-w-[550px] md:max-w-[700px] lg:max-w-[1300px] h-[85vh] p-0 overflow-hidden">
+                    <DialogHeader className="p-4 pr-12 text-left">
+                        <DialogTitle>
+                            {selectedRound?.roundName}
+                        </DialogTitle>
+                        {fetchingResult && (
+                            <div className="py-2">
+                                <BarLoader width={"100%"} color="gray" />
+                            </div>
+                        )}
+                    </DialogHeader>
 
-            <Card>
+                    {/* {JSON.stringify(fetchedResult)} */}
 
-                <CardContent className="p-4 md:p-6">
+                    <div className="h-full overflow-y-auto">
 
-                    <div className="mb-4">
-                        <h2 className="text-xl font-semibold">
-                            Hiring Process
-                        </h2>
 
-                        <p className="text-sm text-muted-foreground">
-                            Track your progress through each hiring stage
-                        </p>
-                    </div>
+                        {!fetchingResult && fetchedResult?.success && (
+                            <>
+                                {sessionType === "MOCK_INTERVIEW" && (
+                                    <InterviewResult
+                                        result={fetchedResult}
+                                    />
+                                )}
 
-                    <div className="relative">
+                                {sessionType === "CODING_ROUND" && (
+                                    <CodingResult
+                                        assessmentResult={fetchedResult}
+                                    />
+                                )}
 
-                        {/* Desktop Timeline Line */}
+                                {sessionType === "ASSESSMENT_CENTER" && (
+                                    <AssessmentResult
+                                        result={fetchedResult}
+                                    />
+                                )}
+                            </>
+                        )}
 
-                        <div className="space-y-5">
-
-                            {rounds.map((round, index) => {
-
-                                const isPassed =
-                                    round.status === "PASSED";
-
-                                const isCurrent =
-                                    round.status === "PENDING" ||
-                                    round.status === "IN_PROGRESS";
-
-                                const isLocked =
-                                    round.status === "LOCKED";
-
-                                const isFailed = round.status === "FAILED";
-
-                                return (
-                                    <div
-                                        key={round.roundId}
-                                        className="relative flex gap-4"
-                                    >
-
-                                        {/* Timeline Icon */}
-
-                                        <div className="relative shrink-0">
-
-                                            {isPassed && (
-                                                <div className="relative z-10 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                                                    <CheckCircle2 className="h-5 w-5 text-green-600" />
-                                                </div>
-                                            )}
-
-                                            {isCurrent && (
-                                                <div className="relative z-10 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                    <PlayCircle className="h-5 w-5 text-blue-600" />
-                                                </div>
-                                            )}
-
-                                            {isLocked && (
-                                                <div className="relative z-10 h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                                                    <Lock className="h-5 w-5 text-muted-foreground" />
-                                                </div>
-                                            )}
-
-                                            {isFailed && (
-                                                <div className="relative z-10 h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-                                                    <XCircle className="h-5 w-5 text-red-600" />
-                                                </div>
-                                            )}
-
-                                            {index !== rounds.length - 1 && (
-                                                <div className="absolute left-1/2 top-10 -translate-x-1/2 h-[calc(100%+20px)] w-[2px] bg-border" />
-                                            )}
-
-                                        </div>
-
-                                        {/* Round Card */}
-
-                                        <Card
-                                            className={`flex-1 ${isCurrent
-                                                ? "border-primary shadow-sm"
-                                                : ""
-                                                }`}
-                                        >
-                                            <CardContent className="p-4">
-
-                                                <div className="flex flex-col gap-3">
-
-                                                    <div>
-                                                        <h3 className="font-semibold">
-                                                            {round.roundName}
-                                                        </h3>
-
-                                                        <p className="text-sm text-muted-foreground mt-1">
-                                                            {round.purpose}
-                                                        </p>
-                                                    </div>
-
-                                                    <div className="flex flex-wrap gap-2">
-
-                                                        <Badge variant="secondary">
-                                                            {getRoundTypeLabel(round.roundType)}
-                                                        </Badge>
-
-                                                        <Badge>
-                                                            {round.difficulty}
-                                                        </Badge>
-
-                                                        <Badge variant="outline">
-                                                            Pass: {round.passingScore}%
-                                                        </Badge>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </CardContent>
-                                        </Card>
-
-                                    </div>
-                                );
-                            })}
-
-                        </div>
+                        {!fetchingResult && !fetchedResult?.success && (
+                            <div className="text-center py-10">
+                                Result not found
+                            </div>
+                        )}
 
                     </div>
-
-                </CardContent>
-
-            </Card>
-
-        </div>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 };
 

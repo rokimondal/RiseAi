@@ -2,13 +2,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import React from 'react'
 
-const IntroductionPage = ({ setStep, data }) => {
+const IntroductionPage = ({ setStep }) => {
     const handleNextStep = () => {
-        if (data.type == "normal"){
-            setStep(2);
-        }else{
-            setStep(4);
-        }
+        setStep(2);
     }
     return (
         <Card className="mx-2">

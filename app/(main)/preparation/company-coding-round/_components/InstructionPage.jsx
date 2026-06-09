@@ -1,16 +1,17 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Loader2 } from 'lucide-react'
 import React, { useState } from 'react'
 
-const InstructionPage = ({ setStep, data }) => {
+const InstructionPage = ({ setStep, type, handleStartAssesment, generatingAssesment, sessionId }) => {
     const [accepted, setAccepted] = useState(false);
 
     const handleNextStep = () => {
-        if (data.type == "normal") {
-            setStep(2);
+        if (type == "hiring" && sessionId) {
+            handleStartAssesment?.();
         } else {
-            setStep(3);
+            setStep(2);
         }
     }
     return (
@@ -37,7 +38,7 @@ const InstructionPage = ({ setStep, data }) => {
                     <li>Final scoring is based on correctness, logic, and efficiency.</li>
                     <li>Refreshing or leaving the page may result in test termination.</li>
                 </ul>
-                
+
                 <div className="flex items-center space-x-2 pt-2">
                     <Checkbox
                         id="accept"
@@ -58,9 +59,12 @@ const InstructionPage = ({ setStep, data }) => {
                 <Button
                     onClick={() => handleNextStep()}
                     className="w-full"
-                    disabled={!accepted}
+                    disabled={!accepted || generatingAssesment}
                 >
-                    Continue
+                    {generatingAssesment ? <>
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                        Starting...
+                    </> : (type == "hiring" && sessionId ? "Start Assessment" : "Continue")}
                 </Button>
             </CardFooter>
         </Card>
