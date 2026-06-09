@@ -46,12 +46,12 @@ const CompanySmulationSteps = () => {
     }
   }, [generatedPlan, fetchedSimulationData]);
 
-  useEffect(() => {
-    const call = async () => {
-      await fetchingSimulationFn({ sessionToken: "cmq4oxgk2000zm6sc8nrb8js0" });
-    }
-    call();
-  }, [])
+  // useEffect(() => {
+  //   const call = async () => {
+  //     await fetchingSimulationFn({ sessionToken: "" });
+  //   }
+  //   call();
+  // }, [])
 
   const setAfterResumePage = () => {
     setStep(4);
