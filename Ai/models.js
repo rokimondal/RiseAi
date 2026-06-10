@@ -3,10 +3,6 @@ import { openRouterCall } from "./providers/openRouter";
 
 export const models = [
     {
-        name: "gemini-flash",
-        call: geminiCall,
-    },
-    {
         name: "nex-n2-pro",
         call: (prompt) =>
             openRouterCall(prompt, "nex-agi/nex-n2-pro:free"),
@@ -51,5 +47,9 @@ export const models = [
         call: (prompt) =>
             openRouterCall(prompt, "liquid/lfm-2.5-1.2b-thinking:free"),
     },
-    
+    {
+        name: "gemini-flash",
+        call: geminiCall,
+    },
+
 ];
