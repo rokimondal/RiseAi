@@ -12,8 +12,6 @@ export async function GET(request) {
         );
     }
 
-    console.log(modelStats);
-
     return Response.json(modelStats);
     
 }
