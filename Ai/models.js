@@ -51,5 +51,5 @@ export const models = [
         call: (prompt) =>
             openRouterCall(prompt, "liquid/lfm-2.5-1.2b-thinking:free"),
     },
-    
+
 ];
