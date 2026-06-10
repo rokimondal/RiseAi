@@ -273,8 +273,8 @@ export const getGenerateExamBasedCodingAssessmentPrompt = (payload)=>{
     
     Determine exam pattern based on:
     
-    Company Name: ${companyName}
-    Exam Name: ${examName}
+    Company Name: ${payload.companyName}
+    Exam Name: ${payload.examName}
     
     Rules:
     
