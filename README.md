@@ -2,7 +2,7 @@
 
 ### AI-Powered Career Growth & Interview Preparation Platform
 
-🌐 Live Demo:[**https://rise-ai-umber.vercel.app/**](https://rise-ai-umber.vercel.app/)
+🌐 Live Demo: [**https://rise-ai-umber.vercel.app/**](https://rise-ai-umber.vercel.app/)
 
 An AI-powered career growth and interview preparation platform designed to help users improve resumes, generate cover letters, practice coding interviews, conduct mock interviews, complete assessment centers, and simulate real-world company hiring processes.
 
