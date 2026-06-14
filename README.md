@@ -1,5 +1,9 @@
 # 🚀 RiseAI
 
+### AI-Powered Career Growth & Interview Preparation Platform
+
+**🌐 Live Demo: **[**https://rise-ai-umber.vercel.app/**](https://rise-ai-umber.vercel.app/)
+
 An AI-powered career growth and interview preparation platform designed to help users improve resumes, generate cover letters, practice coding interviews, conduct mock interviews, complete assessment centers, and simulate real-world company hiring processes.
 
 ---
@@ -8,17 +12,17 @@ An AI-powered career growth and interview preparation platform designed to help 
 
 RiseAI combines AI, real-time voice interviews, coding assessments, assessment centers, industry insights, and job tracking into a unified career development platform.
 
-The platform enables users to:
+### Key Capabilities
 
-- Generate professional resumes
-- Improve existing resumes
-- Generate tailored cover letters
-- Practice technical interviews
-- Complete coding challenges
-- Participate in assessment centers
-- Simulate real company hiring pipelines
-- Track job applications
-- Receive AI-powered feedback and recommendations
+* 📄 Resume Builder
+* 📝 Cover Letter Generator
+* 🎤 Mock Interview Simulator
+* 💻 Coding Assessment Platform
+* 📚 Assessment Center
+* 🏢 Company Hiring Simulation
+* 📈 Industry Insights Dashboard
+* 💼 Job Tracker
+* 💳 Credit Management System
 
 ---
 
@@ -60,252 +64,333 @@ Server Actions
 
 ## Frontend
 
-- Next.js App Router
-- React
-- Zustand
-- Tiptap Editor
-- Monaco Editor
-- Recharts
-- TailwindCSS
+* Next.js App Router
+* React
+* Zustand
+* Tiptap Editor
+* Monaco Editor
+* Recharts
+* Tailwind CSS
 
 ## Backend
 
-- Next.js Server Actions
-- Prisma ORM
-- PostgreSQL
+* Next.js Server Actions
+* Prisma ORM
+* PostgreSQL
 
 ## AI Services
 
-- Gemini
-- OpenRouter
-- Vapi AI
-- Deepgram
+* Gemini
+* OpenRouter
+* Vapi AI
+* Deepgram
 
 ## Authentication
 
-- Clerk
+* Clerk
 
 ## Background Processing
 
-- Inngest
+* Inngest
 
 ---
 
 # ✨ Core Features
 
----
+## 📄 Resume Builder
 
-## 1. Resume Generator
+A unified resume management system that allows users to generate, improve, edit, and save resumes using AI.
 
-Generates professional resumes from user-provided information.
+### Features
+
+* AI Resume Generation
+* AI Resume Improvement
+* Resume Editing
+* ATS Optimization
+* Resume Storage
 
 ### Workflow
 
-User Input
-→ Server Action
-→ AI Generation
-→ Resume Output
-→ Save Resume
+```text
+User Information
+      │
+      ▼
+generateRESUME
+      │
+      ▼
+AI Generation
+      │
+      ▼
+Resume Editor
+      │
+      ▼
+Save Resume
+```
 
 ### Database
 
-- User
-- Resume
+* User
+* Resume
 
 ---
 
-## 2. Resume Improver
+## 📝 Cover Letter Generator
 
-Improves existing resumes using AI while protecting sensitive information.
-
-### Workflow
-
-Resume Content
-→ Mask Personal Data
-→ AI Improvement
-→ Restore Data
-→ Updated Resume
-
-### Database
-
-- Resume
-
----
-
-## 3. Cover Letter Generator
-
-Creates customized cover letters based on job descriptions and user profiles.
+Generate personalized cover letters using job descriptions and user profile information.
 
 ### Workflow
 
+```text
 Job Details
-→ Fetch User Profile
-→ AI Generation
-→ Save Cover Letter
-→ Display Result
+      │
+      ▼
+Fetch User Profile
+      │
+      ▼
+AI Generation
+      │
+      ▼
+Save Cover Letter
+      │
+      ▼
+Display Result
+```
 
 ### Database
 
-- User
-- CoverLetter
+* User
+* CoverLetter
 
 ---
 
-## 4. Industry Insights Dashboard
+## 📈 Industry Insights Dashboard
 
 Provides:
 
-- Salary ranges
-- Market outlook
-- Industry growth
-- Skills demand
-- Career trends
+* Salary Insights
+* Industry Trends
+* Growth Predictions
+* Skills Demand Analysis
+* Career Recommendations
 
 ### Workflow
 
+```text
 Dashboard Request
-→ Check Cache
-→ AI Generate Insights
-→ Store Insights
-→ Display Dashboard
+      │
+      ▼
+Check Cache
+      │
+      ▼
+Generate AI Insights
+      │
+      ▼
+Store Insights
+      │
+      ▼
+Dashboard Analytics
+```
 
 ### Database
 
-- User
-- IndustryInsight
+* User
+* IndustryInsight
 
 ---
 
-## 5. Technical Interview Simulator
+## 🎤 Mock Interview Simulator
 
-Generates interview questions and evaluates responses.
+Generate AI-powered interview sessions and evaluate responses.
 
 ### Workflow
 
+```text
 Interview Setup
-→ AI Question Generation
-→ User Answers
-→ Evaluation Engine
-→ Result Generation
+      │
+      ▼
+AI Question Generation
+      │
+      ▼
+Interview Session
+      │
+      ▼
+Evaluation
+      │
+      ▼
+Feedback Report
+```
 
 ### Database
 
-- SimulationSession
-- SimulationResult
+* SimulationSession
+* SimulationResult
 
 ---
 
-## 6. Live Voice Mock Interview
+## 🎙 Live Voice Interview
 
-Uses Vapi AI and Deepgram for real-time interview experiences.
+Real-time voice interviews powered by Vapi AI and Deepgram.
 
 ### Workflow
 
+```text
 Interview Plan
-→ Vapi Voice Session
-→ Transcript Collection
-→ AI Evaluation
-→ Feedback Report
+      │
+      ▼
+Voice Session
+      │
+      ▼
+Transcript Collection
+      │
+      ▼
+AI Evaluation
+      │
+      ▼
+Feedback Report
+```
 
 ### Database
 
-- SimulationSession
-- SimulationResult
+* SimulationSession
+* SimulationResult
 
 ---
 
-## 7. Coding Assessment
+## 💻 Coding Assessment Platform
 
-Generates coding challenges and evaluates solutions.
+Practice coding challenges and company-specific coding rounds.
 
 ### Workflow
 
-Assessment Generation
-→ AI Problem Creation
-→ User Coding
-→ Sandbox Execution
-→ AI Evaluation
-→ Result Report
+```text
+Generate Assessment
+       │
+       ▼
+Coding Challenge
+       │
+       ▼
+Run Code
+       │
+       ▼
+Code Execution Engine
+       │
+       ▼
+Submit Solution
+       │
+       ▼
+Evaluation
+       │
+       ▼
+Feedback Report
+```
 
 ### Database
 
-- SimulationSession
-- SimulationResult
+* SimulationSession
+* SimulationResult
 
 ---
 
-## 8. Assessment Center
+## 📚 Assessment Center
 
-Creates multi-section examinations.
+Multi-section examination system with AI-generated content and evaluation.
 
-### Supported Question Types
+### Supported Questions
 
-- Single Select
-- Multi Select
-- Short Answer
-- Long Answer
+* Single Select
+* Multi Select
+* Short Answer
+* Long Answer
 
 ### Workflow
 
+```text
 Assessment Planning
-→ AI Section Generation
-→ User Submission
-→ Evaluation
-→ Result Generation
+        │
+        ▼
+Section Generation
+        │
+        ▼
+Assessment Session
+        │
+        ▼
+Evaluation
+        │
+        ▼
+Result Generation
+```
 
 ### Database
 
-- SimulationSession
-- SimulationResult
+* SimulationSession
+* SimulationResult
 
 ---
 
-## 9. Company Hiring Simulation
+## 🏢 Company Hiring Simulation
 
-Simulates complete hiring pipelines.
+Simulates real-world company recruitment pipelines.
 
 ### Supported Rounds
 
-- Coding Round
-- Technical Round
-- Assessment Round
-- HR Interview
+* Coding Round
+* Technical Interview
+* Assessment Round
+* HR Interview
 
 ### Workflow
 
+```text
 Simulation Planning
-→ Round Execution
-→ Evaluation
-→ Progress Tracking
-→ Final Hiring Report
+       │
+       ▼
+Round Execution
+       │
+       ▼
+Evaluation
+       │
+       ▼
+Progress Tracking
+       │
+       ▼
+Final Hiring Report
+```
 
 ### Database
 
-- SimulationSession
-- SimulationResult
+* SimulationSession
+* SimulationResult
 
 ---
 
-## 10. LinkedIn Job Tracker
+## 💼 Job Tracker
 
-Tracks relevant jobs and application statuses.
+Discover and track job opportunities.
 
 ### Workflow
 
+```text
 Industry Keywords
-→ LinkedIn Search
-→ Job Extraction
-→ Application Tracking
+        │
+        ▼
+Job Search
+        │
+        ▼
+Job Extraction
+        │
+        ▼
+Application Tracking
+```
 
 ### Database
 
-- AppliedJob
+* AppliedJob
 
 ---
 
 # 🤖 AI Architecture
 
-All AI-powered features utilize a centralized AI layer.
+All AI-powered modules communicate through a centralized AI orchestration layer.
 
 ```text
 Feature
@@ -318,43 +403,53 @@ callAI()
     └── Fallback Models
 ```
 
-Used by:
+Used By:
 
-- Resume Generator
-- Resume Improver
-- Cover Letter Generator
-- Interview Simulator
-- Assessment Center
-- Coding Evaluation
-- Industry Insights
-- Company Simulation
+* Resume Builder
+* Cover Letter Generator
+* Industry Insights
+* Mock Interview
+* Voice Interview
+* Coding Assessment
+* Assessment Center
+* Company Simulation
 
 ---
 
 # 💳 Credit System
 
-RiseAI uses a credit-based consumption model.
+RiseAI uses a credit-based usage model.
 
 ### Credit Usage
 
-- Content Generation
-- Assessment Creation
-- Interview Creation
-- Evaluations
-- Runtime Execution
+* Content Generation
+* Assessment Generation
+* Interview Generation
+* Evaluations
+* Runtime Execution
 
 ### Workflow
 
+```text
 Request
-→ Credit Check
-→ Deduct Credits
-→ Execute Feature
-→ Log Transaction
+   │
+   ▼
+Credit Check
+   │
+   ▼
+Deduct Credits
+   │
+   ▼
+Execute Feature
+   │
+   ▼
+Log Transaction
+```
 
 ### Database
 
-- User
-- CreditTransaction
+* User
+* CreditTransaction
 
 ---
 
@@ -364,66 +459,70 @@ All preparation modules follow a common lifecycle.
 
 ```text
 Session Created
-        │
-        ▼
-     STARTED
-        │
-        ▼
- User Interaction
-        │
-        ▼
-    SUBMITTED
-        │
-        ▼
-   EVALUATION
-        │
-        ▼
-    COMPLETED
+       │
+       ▼
+    STARTED
+       │
+       ▼
+User Interaction
+       │
+       ▼
+   SUBMITTED
+       │
+       ▼
+  EVALUATION
+       │
+       ▼
+   COMPLETED
 ```
 
 ### Database
 
-- SimulationSession
-- SimulationResult
+* SimulationSession
+* SimulationResult
 
 ---
 
 # 🗄 Database Models
 
-## Core Models
+### Core Models
 
-- User
-- Resume
-- CoverLetter
-- IndustryInsight
-- AppliedJob
-- Assessment
-- SimulationSession
-- SimulationResult
-- CreditTransaction
+* User
+* Resume
+* CoverLetter
+* IndustryInsight
+* AppliedJob
+* Assessment
+* SimulationSession
+* SimulationResult
+* CreditTransaction
 
 ---
 
 # 🔐 Authentication
 
-Authentication is managed using Clerk.
+Authentication is powered by Clerk.
 
-Capabilities:
+### Features
 
-- Sign Up
-- Sign In
-- Session Validation
-- User Synchronization
+* Sign Up
+* Sign In
+* Session Management
+* User Synchronization
+* Protected Routes
 
 ---
 
 # 📈 Background Jobs
 
-Inngest is used for:
+Powered by Inngest.
 
-- Industry Insight Refresh
-- Scheduled Processing
-- AI Data Updates
+### Responsibilities
+
+* Industry Insight Refresh
+* Scheduled Processing
+* AI Data Updates
+* Background Tasks
 
 ---
 
