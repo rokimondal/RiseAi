@@ -4,6 +4,7 @@ import BackButton from '../../../../components/BackButton'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import InterviewPageSteps from './_components/InterviewPageSteps';
+import { redirect } from 'next/navigation';
 
 const MockInterviewPage = async () => {
     const { isOnboarded } = await getUserOnboardingStatus();

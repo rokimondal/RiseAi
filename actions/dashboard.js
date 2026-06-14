@@ -1,6 +1,7 @@
 "use server"
 
 import { callAI } from "@/Ai/callAI";
+import { getGenerateIndustryPrompt } from "@/Ai/prompts/industryInsights";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
