@@ -2,6 +2,7 @@ import { getUserOnboardingStatus } from '@/actions/user';
 import React from 'react'
 import BackButton from '../../../../components/BackButton';
 import AssessmentSteps from './_components/AssessmentSteps';
+import { redirect } from 'next/navigation';
 
 const page = async () => {
   const { isOnboarded } = await getUserOnboardingStatus();

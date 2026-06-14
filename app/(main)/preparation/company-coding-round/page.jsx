@@ -4,6 +4,7 @@ import BackButton from '../../../../components/BackButton'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import CodingPageSteps from './_components/CodingPageSteps';
+import { redirect } from 'next/navigation';
 
 const CompanyCodingPage = async () => {
     const { isOnboarded } = await getUserOnboardingStatus();

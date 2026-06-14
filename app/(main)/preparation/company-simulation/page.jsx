@@ -2,6 +2,7 @@ import React from 'react'
 import CompanySmulationSteps from './_components/CompanySmulationSteps';
 import { getUserOnboardingStatus } from '@/actions/user';
 import BackButton from '../../../../components/BackButton';
+import { redirect } from 'next/navigation';
 
 const Page = async () => {
     const { isOnboarded } = await getUserOnboardingStatus();
