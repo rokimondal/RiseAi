@@ -141,7 +141,8 @@ export async function getAssessmentsAndSimulations() {
             } else if (
                 session.status === "STARTED" &&
                 session.startedAt &&
-                isSameDay(new Date(session.startedAt), today)
+                isSameDay(new Date(session.startedAt), today) &&
+                session.type !== "COMPANY_SIMULATION"
             ) {
                 action = "ATTEMPTED_TODAY";
             } else if (session.status === "STARTED") {
@@ -182,60 +183,4 @@ export async function getAssessmentsAndSimulations() {
         console.error("Error fetching assessments:", error);
         throw new Error("Failed to fetch assessments");
     }
-}
-
-
-export async function getSessionResult({ result }) {
-    console.log(sessionToken)
-    const { userId } = await auth();
-
-    if (!userId) {
-        throw new Error("Unauthorized");
-    }
-
-    const user = await db.user.findUnique({
-        where: {
-            clerkUserId: userId,
-        },
-    });
-
-    if (!user) {
-        throw new Error("User not exist");
-    }
-    console.log(sessionToken)
-    console.log(sessionId)
-
-    const where = sessionId
-        ? { id: sessionId }
-        : { sessionToken };
-
-    const session = await db.simulationSession.findFirst({
-        where,
-
-        select: {
-            id: true,
-            sessionToken: true,
-            userId: true,
-            type: true,
-            status: true,
-            startedAt: true,
-            result: true,
-            payload: true,
-        },
-    });
-
-    if (!session) {
-        throw new Error("Session not found");
-    }
-
-    if (session.userId !== user.id) {
-        throw new Error("Unauthorized");
-    }
-
-    console.log(session)
-
-    return {
-        success: true,
-        data: { session },
-    };
 }
