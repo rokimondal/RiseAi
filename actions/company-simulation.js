@@ -1085,6 +1085,8 @@ export async function evaluationRound({ parentSessionId, roundId, roundSessionTo
         ...session.payload.simulationMetadata,
     };
 
+    let parentStatus = "STARTED";
+
     if (passed) {
 
         const nextRoundIndex =
@@ -1104,12 +1106,14 @@ export async function evaluationRound({ parentSessionId, roundId, roundSessionTo
 
             simulationMetadata.overallStatus =
                 "COMPLETED";
+            parentStatus = "SUBMITTED";
         }
 
     } else {
 
         simulationMetadata.overallStatus =
             "FAILED";
+        parentStatus = "SUBMITTED";
     }
 
     await db.simulationSession.update({
@@ -1117,6 +1121,7 @@ export async function evaluationRound({ parentSessionId, roundId, roundSessionTo
             id: session.id,
         },
         data: {
+            status: parentStatus,
             payload: {
                 ...session.payload,
                 rounds: updatedRounds,

@@ -7,11 +7,11 @@ import { Button } from './ui/button'
 const HeaderAuth = () => {
     return (
         <>
-            <SignedOut
-                mode="modal"
-                fallbackRedirectUrl="/dashboard"
-            >
-                <SignInButton>
+            <SignedOut>
+                <SignInButton
+                    mode="modal"
+                    fallbackRedirectUrl="/dashboard"
+                >
                     <Button variant={"outline"} className="ml-2"> Sign In</Button>
                 </SignInButton>
             </SignedOut>

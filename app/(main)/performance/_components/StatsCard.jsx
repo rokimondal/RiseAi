@@ -2,29 +2,31 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, Trophy } from 'lucide-react';
 import React from 'react'
 
-const StatsCard = ({ assessments }) => {
+const StatsCard = ({ completedAssessments }) => {
+
+    if (!completedAssessments?.length) return 0;
 
     const getAverageScore = () => {
-        if (!assessments?.length) return 0;
-        const total = assessments.reduce(
-            (sum, assessments) => sum + assessments.quizScore, 0
+        if (!completedAssessments?.length) return 0;
+        const total = completedAssessments.reduce(
+            (sum, assessment) => sum + assessment.score, 0
         )
 
-        return (total / assessments.length).toFixed(1);
+        return (total / completedAssessments.length).toFixed(1);
 
     }
 
     const getTotalQuestions = () => {
-        if (!assessments?.length) return 0;
-        return assessments.reduce(
-            (sum, assessments) => sum + assessments.questions.length, 0
+        if (!completedAssessments?.length) return 0;
+        return completedAssessments.reduce(
+            (sum, assessments) => sum + assessments.totalQuestions, 0
         )
 
     }
 
     const getLatestAssessment = () => {
-        if (!assessments?.length) return null;
-        return assessments[0];
+        if (!completedAssessments?.length) return null;
+        return completedAssessments[0];
     }
 
     return (
@@ -57,7 +59,7 @@ const StatsCard = ({ assessments }) => {
                     <Trophy className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent className="space-y-1">
-                    <div className="text-2xl font-bold">{getLatestAssessment()?.quizScore.toFixed(1) || 0}%</div>
+                    <div className="text-2xl font-bold">{getLatestAssessment()?.score?.toFixed(1) || 0}%</div>
                     <p className="text-xs text-muted-foreground">Most recent quiz</p>
                 </CardContent>
             </Card>

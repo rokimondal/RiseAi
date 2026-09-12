@@ -6,9 +6,8 @@ import QuestionAnswereCard from './QuestionAnswereCard';
 import { Button } from '@/components/ui/button';
 
 const QuizResult = ({ result, hideStartNew = false, onStartNew }) => {
-
+    console.log(result)
     if (!result) return null;
-    console.log(result);
     return (
         <div className='mx-auto'>
             <h1 className='flex items-center gap-2 text-3xl gradient-title'>
