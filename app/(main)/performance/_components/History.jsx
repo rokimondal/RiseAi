@@ -13,6 +13,7 @@ import InterviewResult from '../../preparation/mock-interview/_components/Interv
 import CodingResult from '../../preparation/company-coding-round/_components/CodingResult';
 import AssessmentResult from '../../preparation/assessment-center/_components/AssessmentResult';
 import { BarLoader } from 'react-spinners';
+import { toast } from 'sonner';
 
 const History = ({ assessmentsData }) => {
 
@@ -39,14 +40,35 @@ const History = ({ assessmentsData }) => {
         }
     }
 
-    const handleReTake = async () => {
-        
+    const handleTakeTest = async (assessment) => {
+        switch (assessment.type) {
+            case "ASSESSMENT_CENTER":
+                router.push(`/preparation/assessment-center/${assessment.id}`);
+                break;
+
+            case "CODING_ROUND":
+                router.push(`/preparation/company-coding-round/${assessment.id}`);
+                break;
+
+            case "MOCK_INTERVIEW":
+                router.push(`/preparation/mock-interview/${assessment.id}`);
+                break;
+
+            case "COMPANY_SIMULATION":
+                router.push(`/preparation/company-simulation/${assessment.id}`);
+                break;
+
+            default:
+                // console.error("Unknown assessment type:", assessment.type);
+                toast.error("Unknown assessment type")
+        }
     }
 
     useEffect(() => {
         console.log(fetchedResult)
     }, [fetchedResult])
 
+    console.log(assessmentsData)
     return (
         <div>
             <>
@@ -147,9 +169,7 @@ const History = ({ assessmentsData }) => {
 
                                             {assessment.action === "TAKE_TEST" && (
                                                 <Button
-                                                    onClick={() =>
-                                                        router.push(`/simulation/${assessment.sessionToken}`)
-                                                    }
+                                                    onClick={() => handleTakeTest(assessment)}
                                                 >
                                                     Take Test
                                                 </Button>

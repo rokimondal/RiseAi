@@ -21,13 +21,13 @@ model User {
   experience         Int?
   skills             String[]
   credits            Int                 @default(20)
-  creditTransactions CreditTransaction[]
+  appliedJobs        AppliedJob[]
   assessments        Assessment[]
   coverLetter        CoverLetter[]
-  appliedJobs        AppliedJob[]
-  simulationSessions SimulationSession[]
-  simulationResults  SimulationResult[]
+  creditTransactions CreditTransaction[]
   resume             Resume?
+  simulationResults  SimulationResult[]
+  simulationSessions SimulationSession[]
   industryInsight    IndustryInsight?    @relation(fields: [industry], references: [industry])
 }
 
@@ -63,9 +63,9 @@ model CoverLetter {
   jobDescription String?
   companyName    String
   jobTitle       String
-  status         String   @default("draft") // draft, completed
   createdAt      DateTime @default(now())
   updateAt       DateTime @updatedAt
+  status         String   @default("draft")
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -114,23 +114,23 @@ model AppliedJob {
 
 model SimulationSession {
   id               String            @id @default(cuid())
-  sessionToken     String            @unique @default(cuid())
   userId           String
   type             SimulationType
-  status           SessionStatus     @default(STARTED)
   payload          Json?
-  startedAt        DateTime?
-  submittedAt      DateTime?
   expiresAt        DateTime?
-  durationSeconds  Int?
-  autoSubmitted    Boolean           @default(false)
-  creditsUsed      Int               @default(0)
   createdAt        DateTime          @default(now())
+  startedAt        DateTime?
+  status           SessionStatus     @default(STARTED)
+  submittedAt      DateTime?
   updatedAt        DateTime          @updatedAt
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  result           SimulationResult?
-  parentSessionId  String?
+  autoSubmitted    Boolean           @default(false)
+  durationSeconds  Int?
+  sessionToken     String            @unique @default(cuid())
+  creditsUsed      Int               @default(0)
   linkedSessionIds String[]          @default([])
+  parentSessionId  String?
+  result           SimulationResult?
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
@@ -142,8 +142,6 @@ model SimulationSession {
 
 model SimulationResult {
   id             String             @id @default(cuid())
-  sessionId      String?            @unique
-  session        SimulationSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
   userId         String
   type           SimulationType
   score          Float
@@ -152,6 +150,8 @@ model SimulationResult {
   improvementTip String?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
+  sessionId      String?            @unique
+  session        SimulationSession? @relation(fields: [sessionId], references: [id])
   user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -175,8 +175,8 @@ model CreditTransaction {
 enum SessionStatus {
   STARTED
   SUBMITTED
-  EVALUATION_PENDING
   EXPIRED
+  EVALUATION_PENDING
 }
 
 enum ApplicationStatus {
