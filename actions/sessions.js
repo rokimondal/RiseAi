@@ -55,7 +55,6 @@ export async function getSessionDetails({ sessionId, sessionToken }) {
 }
 
 export async function getSessionResultDetails({ sessionId, sessionToken }) {
-    console.log(sessionToken)
     const { userId } = await auth();
 
     if (!userId) {
@@ -71,8 +70,8 @@ export async function getSessionResultDetails({ sessionId, sessionToken }) {
     if (!user) {
         throw new Error("User not exist");
     }
-    console.log(sessionToken)
     console.log(sessionId)
+    console.log(sessionToken)
 
     const where = sessionId
         ? { id: sessionId }

@@ -3,16 +3,21 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { generateAIInsights } from "./dashboard";
+import { checkUser } from "@/lib/checkUser";
 
 export async function updateUser(data) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
         where: {
             clerkUserId: userId,
         },
     })
+
+    if (!user) {
+        user = await checkUser();
+    }
 
     if (!user) throw new Error("User not exist");
 
@@ -74,24 +79,24 @@ export async function getUserOnboardingStatus() {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
         where: {
             clerkUserId: userId,
         },
+        select: {
+            industry: true,
+        }
     })
 
-    if (!user) throw new Error("User not exist");
-    try {
-        const user = await db.user.findUnique({
-            where: {
-                clerkUserId: userId,
-            },
-            select: {
-                industry: true,
-            }
-        })
+    if (!user) {
+        user = await checkUser();
+        console.log("User not found, created new user: ", user);
+    }
 
-        return { isOnboarded: !!user?.industry };
+    if (!user) throw new Error("User not exist");
+    
+    try {
+        return { isOnboarded: !!user.industry };
     } catch (error) {
         console.error("Error checking onBoarding status: ", error.message);
         throw new Error("Failed to check onBoarding status");

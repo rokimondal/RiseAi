@@ -66,7 +66,7 @@ export async function saveQuizResult(questions, answeres, score) {
             .join("\n\n");
 
         try {
-            const result = await callAI(getImprovementTipPrompt);
+            const result = await callAI(getImprovementTipPrompt(user, wrongQuestionsText));
             improvementTip = result.improvementTip || null;
         } catch (error) {
             console.error("Error generating improvement tip:", error.message);
@@ -115,6 +115,8 @@ export async function getAssessments() {
                 createdAt: "desc",
             }
         })
+
+        console.log(assessments);
 
         return assessments;
     } catch (error) {

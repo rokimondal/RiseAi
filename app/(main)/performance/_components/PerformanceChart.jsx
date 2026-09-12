@@ -1,30 +1,101 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { format } from "date-fns";
+import { differenceInDays, differenceInMonths, format, startOfMonth, startOfWeek, startOfYear } from "date-fns";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 
 
-const PerformanceChart = ({ assessments }) => {
+const PerformanceChart = ({ completedAssessments }) => {
     const { resolvedTheme } = useTheme()
     const lineColour = resolvedTheme === "dark" ? "#FFFFFF" : "#000000"
 
     const [chartData, setChartData] = useState([]);
 
     useEffect(() => {
-        if (assessments) {
-            const formattedData = assessments.slice().reverse().map(assessment => ({
-                date: format(new Date(assessment.createdAt), "MMM dd"),
-                score: assessment.quizScore
-            }));
-
-            console.log(formattedData);
-            setChartData(formattedData);
+        if (!completedAssessments?.length) {
+            setChartDat([]);
+            return;
         }
-    }, [assessments])
+
+        const sortedData = completedAssessments
+            .slice()
+            .sort(
+                (a, b) =>
+                    new Date(a.createdAt) - new Date(b.createdAt)
+            );
+
+        const firstDate = new Date(sortedData[0].createdAt);
+        const lastDate = new Date(
+            sortedData[sortedData.length - 1].createdAt
+        );
+
+        const totalDays = differenceInDays(lastDate, firstDate);
+        const totalMonths = differenceInMonths(lastDate, firstDate);
+        let groupedData = {};
+
+        if (totalDays <= 30) {
+            // Day-wise
+            sortedData.forEach((assessment) => {
+                const date = format(
+                    new Date(assessment.createdAt),
+                    "MMM dd"
+                );
+
+                groupedData[date] ??= [];
+                groupedData[date].push(assessment.score);
+            });
+        } else if (totalDays <= 365) {
+            // Week-wise
+            sortedData.forEach((assessment) => {
+                const date = format(
+                    startOfWeek(new Date(assessment.createdAt)),
+                    "MMM dd"
+                );
+
+                groupedData[date] ??= [];
+                groupedData[date].push(assessment.score);
+            });
+        } else if (totalMonths <= 48) {
+            // Month-wise
+            sortedData.forEach((assessment) => {
+                const date = format(
+                    startOfMonth(new Date(assessment.createdAt)),
+                    "MMM yyyy"
+                );
+
+                groupedData[date] ??= [];
+                groupedData[date].push(assessment.score);
+            });
+        } else {
+            // Year-wise
+            sortedData.forEach((assessment) => {
+                const date = format(
+                    startOfYear(new Date(assessment.createdAt)),
+                    "yyyy"
+                );
+
+                groupedData[date] ??= [];
+                groupedData[date].push(assessment.score);
+            });
+        }
+
+        const formattedData = Object.entries(groupedData).map(
+            ([date, scores]) => ({
+                date,
+                score: Number(
+                    (
+                        scores.reduce((sum, score) => sum + score, 0) /
+                        scores.length
+                    ).toFixed(1)
+                ),
+            })
+        );
+
+        setChartData(formattedData);
+    }, [completedAssessments])
 
     if (!chartData.length) return null;
 
